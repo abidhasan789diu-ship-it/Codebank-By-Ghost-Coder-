@@ -784,24 +784,47 @@
     function genUUID() { return [4, 4, 4, 4, 12].map(n => Math.random().toString(36).substr(2, n).toUpperCase()).join('-'); }
     function now() { return Date.now(); }
 
-    let savedDB = localStorage.getItem("code789_db");
-
-    const DB = savedDB ? JSON.parse(savedDB) : {
-      users: [
-        { id: 'USR-001', username: 'ghost_coder', password: 'cyber123', created: now() - 86400000 * 5, role: 'user' },
-        { id: 'USR-002', username: 'shadow_dev', password: 'shadow99', created: now() - 86400000 * 2, role: 'user' },
-        { id: 'USR-ADM', username: 'admin', password: 'admin789', created: now() - 86400000 * 30, role: 'admin' }
-      ],
-      snippets: [
-        { id: genUUID(), projectName: 'NeuralNet Core', description: 'Main neural network training loop', language: 'python', expiryType: 'infinite', code: 'import torch\nimport torch.nn as nn\n\nclass NeuralNet(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.layers = nn.Sequential(\n            nn.Linear(784, 256),\n            nn.ReLU(),\n            nn.Linear(256, 10)\n        )\n\n    def forward(self, x):\n        return self.layers(x)', ownerId: 'USR-001', created: now() - 3600000 * 2, accessed: 0, editRequests: [] },
-        { id: genUUID(), projectName: 'CryptoVault Auth', description: 'JWT token generation module', language: 'javascript', expiryType: '25min', code: 'const jwt = require("jsonwebtoken");\n\nfunction generateToken(userId, secret) {\n  return jwt.sign(\n    { id: userId, iat: Date.now() },\n    secret,\n    { expiresIn: "24h" }\n  );\n}', ownerId: 'USR-002', created: now() - 3600000 * 48, accessed: 3, editRequests: [], expiresAt: now() + 60000 * 25 },
-        { id: genUUID(), projectName: 'GhostShell', description: 'Stealth network probe utility', language: 'bash', expiryType: 'one-time', code: '#!/bin/bash\necho ">> Initializing ghost probe..."\nfor port in 22 80 443 8080; do\n  nc -zv $1 $port 2>&1 | grep -q "succeeded" && echo "OPEN: $port"\ndone\necho ">> Scan complete."', ownerId: 'USR-001', created: now() - 3600000, accessed: 0, editRequests: [{ from: 'USR-002', fromName: 'shadow_dev', msg: 'Need edit access for testing', time: now() - 1800000 }] }
-      ],
+    const DB = {
+      users: [],
+      snippets: [],
       editRequests: []
     };
 
-    function saveDB() {
-      localStorage.setItem("code789_db", JSON.stringify(DB));
+    // ─── Firebase save helpers ───────────────────────────────────────────────
+    async function saveUserToFirebase(user) {
+      try { await db.collection("users").doc(user.id).set(user); } catch (e) { console.error("saveUser:", e); }
+    }
+
+    async function saveSnippetToFirebase(snippet) {
+      try { await db.collection("snippets").doc(snippet.id).set(snippet); } catch (e) { console.error("saveSnippet:", e); }
+    }
+
+    async function saveDB() {
+      // sync entire DB to Firestore
+      const batch = db.batch();
+      DB.users.forEach(u => batch.set(db.collection("users").doc(u.id), u));
+      DB.snippets.forEach(s => batch.set(db.collection("snippets").doc(s.id), s));
+      try { await batch.commit(); } catch (e) { console.error("saveDB batch:", e); }
+    }
+
+    // ─── Load everything from Firebase on startup ────────────────────────────
+    async function loadFromFirebase() {
+      try {
+        const [usersSnap, snippetsSnap] = await Promise.all([
+          db.collection("users").get(),
+          db.collection("snippets").get()
+        ]);
+        DB.users = [];
+        usersSnap.forEach(doc => DB.users.push(doc.data()));
+        DB.snippets = [];
+        snippetsSnap.forEach(doc => {
+          const s = doc.data();
+          if (!Array.isArray(s.editRequests)) s.editRequests = [];
+          DB.snippets.push(s);
+        });
+      } catch (e) {
+        console.error("loadFromFirebase:", e);
+      }
     }
     let STATE = {
       view: 'auth',
@@ -833,14 +856,16 @@
       return DB.snippets.filter(s => s.ownerId === uid);
     }
 
-    function handleLogin() {
+    async function handleLogin() {
       const { username, password } = STATE.loginForm;
+      showAlert('info', '[SYNCING] Connecting to the grid...');
+      await loadFromFirebase();
       const user = DB.users.find(u => u.username === username && u.password === password);
       if (!user) { showAlert('error', '[ACCESS DENIED] Invalid credentials'); return; }
       setState({ currentUser: user, view: 'app', activeTab: 'dashboard', alert: null });
     }
 
-    function handleRegister() {
+    async function handleRegister() {
       const { username, password, confirm } = STATE.registerForm;
 
       if (!username || !password) {
@@ -852,6 +877,9 @@
         showAlert('error', '[ERROR] Passwords do not match');
         return;
       }
+
+      // reload latest from firebase before checking duplicates
+      await loadFromFirebase();
 
       if (DB.users.find(u => u.username === username)) {
         showAlert('error', '[ERROR] Username already exists');
@@ -867,8 +895,7 @@
       };
 
       DB.users.push(user);
-      db.collection("users").doc(user.id).set(user);
-      saveDB();
+      await saveUserToFirebase(user);
 
       setState({
         currentUser: user,
@@ -878,7 +905,7 @@
       });
     }
 
-    function handleCreateSnippet() {
+    async function handleCreateSnippet() {
       const { projectName, description, language, expiryType, code } = STATE.newSnippet;
       if (!projectName || !code) { showAlert('error', '[ERROR] Project name and code required'); return; }
       const id = genUUID();
@@ -891,13 +918,13 @@
         expiresAt: expiryType === '25min' ? now() + 25 * 60 * 1000 : null
       };
       DB.snippets.push(snippet);
-      saveDB();
-      const shareUrl = `${window.location.origin}/s/${id}`;
+      await saveSnippetToFirebase(snippet);
+      const shareUrl = `${window.location.href.split('?')[0]}?snippet=${id}`;
       setState({ shareResult: { id, url: shareUrl, expiryType }, newSnippet: { projectName: '', description: '', language: 'python', expiryType: 'infinite', code: '' } });
       showAlert('success', '[SUCCESS] Snippet encrypted and uploaded to the grid');
     }
 
-    function handleViewSnippet() {
+    async function handleViewSnippet() {
       const id = STATE.viewSnippetId.trim().toUpperCase();
       const snippet = DB.snippets.find(s => s.id === id);
       if (!snippet) { showAlert('error', '[404] Snippet not found on the grid'); setState({ viewedSnippet: null }); return; }
@@ -908,11 +935,11 @@
         showAlert('error', '[DESTROYED] One-time snippet already accessed. Data wiped.'); setState({ viewedSnippet: null }); return;
       }
       if (snippet.ownerId !== STATE.currentUser.id) snippet.accessed++;
-      saveDB();
+      await saveSnippetToFirebase(snippet);
       setState({ viewedSnippet: snippet });
     }
 
-    function handleEditRequest(snippetId) {
+    async function handleEditRequest(snippetId) {
       const snippet = DB.snippets.find(s => s.id === snippetId);
       if (!snippet) return;
       if (!STATE.editReqMsg.trim()) { showAlert('error', '[ERROR] Request message required'); return; }
@@ -922,15 +949,15 @@
         msg: STATE.editReqMsg,
         time: now()
       });
-      saveDB();
+      await saveSnippetToFirebase(snippet);
       showAlert('success', '[SENT] Edit permission request transmitted');
       setState({ modal: null, editReqMsg: '' });
     }
 
-    function handleApproveEdit(snippetId, reqIdx) {
+    async function handleApproveEdit(snippetId, reqIdx) {
       const snippet = DB.snippets.find(s => s.id === snippetId);
       if (snippet) snippet.editRequests.splice(reqIdx, 1);
-      saveDB();
+      await saveSnippetToFirebase(snippet);
       showAlert('success', '[GRANTED] Edit access approved');
       render();
     }
@@ -1015,7 +1042,7 @@
       <div class="stat-card"><div class="stat-value" style="color:var(--neon-pink);text-shadow:0 0 10px var(--neon-pink)">${myPending.reduce((a, s) => a + s.editRequests.length, 0)}</div><div class="stat-label">Edit Requests</div></div>
       <div class="stat-card"><div class="stat-value" style="color:var(--neon-green);text-shadow:0 0 10px var(--neon-green)">${totalAccesses}</div><div class="stat-label">Total Accesses</div></div>
     </div>
-
+ 
     ${myPending.length > 0 ? `
     <div class="panel" style="border-color:rgba(255,7,58,0.3)">
       <div class="panel-title" style="color:var(--neon-pink)"><span style="width:3px;height:14px;background:var(--neon-pink);box-shadow:0 0 8px var(--neon-pink);display:block"></span>PENDING EDIT REQUESTS</div>
@@ -1028,12 +1055,12 @@
           </div>
           <div class="edit-btn-row">
             <button class="btn btn-green btn-sm" onclick="handleApproveEdit('${snippet.id}',${ri})">GRANT</button>
-            <button class="btn btn-pink btn-sm" onclick="DB.snippets.find(s=>s.id==='${snippet.id}').editRequests.splice(${ri},1);saveDB();render()">DENY</button>
+            <button class="btn btn-pink btn-sm" onclick="(async()=>{const s=DB.snippets.find(x=>x.id==='${snippet.id}');if(s){s.editRequests.splice(${ri},1);await saveSnippetToFirebase(s);}render();})()">DENY</button>
           </div>
         </div>
       `).join('')).join('')}
     </div>` : ''}
-
+ 
     <div class="panel">
       <div class="panel-title">MY SNIPPET VAULT</div>
       ${mySnippets.length === 0 ? `<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:12px;text-align:center;padding:30px">// No snippets uploaded. Create your first one.</div>` : mySnippets.map(s => `
@@ -1240,7 +1267,7 @@
                 </div>
                 <div class="edit-btn-row">
                   <button class="btn btn-green btn-sm" onclick="handleApproveEdit('${s.id}',${ri});setState({modal:null})">GRANT</button>
-                  <button class="btn btn-pink btn-sm" onclick="DB.snippets.find(x=>x.id==='${s.id}').editRequests.splice(${ri},1);saveDB();render()">DENY</button>
+                  <button class="btn btn-pink btn-sm" onclick="(async()=>{const s=DB.snippets.find(x=>x.id==='${s.id}');if(s){s.editRequests.splice(${ri},1);await saveSnippetToFirebase(s);}render();})()">DENY</button>
                 </div>
               </div>
             `).join('')}
@@ -1329,7 +1356,75 @@
       }
     });
 
-    render();
+    // ─── Public share link handler ──────────────────────────────────────────
+    async function handleShareLink() {
+      const params = new URLSearchParams(window.location.search);
+      const snippetId = params.get('snippet');
+      if (!snippetId) return false;
+
+      // Load from Firebase first
+      await loadFromFirebase();
+
+      const snippet = DB.snippets.find(s => s.id === snippetId.toUpperCase());
+      if (!snippet) {
+        // Show public error page
+        document.getElementById('root').innerHTML = `
+          <div style="min-height:100vh;display:flex;align-items:center;justify-content:center">
+            <div style="text-align:center;font-family:'Share Tech Mono',monospace">
+              <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:#00f5ff;text-shadow:0 0 30px #00f5ff;letter-spacing:6px;margin-bottom:12px">CODE<span style="color:#ff073a">789</span></div>
+              <div style="color:#ff073a;font-size:14px;letter-spacing:2px">[404] SNIPPET NOT FOUND ON THE GRID</div>
+              <button onclick="window.location.href=window.location.href.split('?')[0]" style="margin-top:24px;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;padding:10px 20px;border:1px solid #00f5ff;color:#00f5ff;background:transparent;cursor:pointer">RETURN TO BASE</button>
+            </div>
+          </div>`;
+        return true;
+      }
+
+      // Check code-level expiry (but link itself stays valid)
+      const expired = snippet.expiryType === '25min' && snippet.expiresAt && now() > snippet.expiresAt;
+      const destroyed = snippet.expiryType === 'one-time' && snippet.accessed > 0;
+      const ownerUser = DB.users.find(u => u.id === snippet.ownerId);
+
+      // Increment access counter if not expired/destroyed
+      if (!expired && !destroyed) {
+        snippet.accessed++;
+        await saveSnippetToFirebase(snippet);
+      }
+
+      // Render public snippet page (no login needed)
+      document.getElementById('root').innerHTML = `
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
+          <div style="width:100%;max-width:720px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+              <div style="font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#00f5ff;text-shadow:0 0 20px #00f5ff;letter-spacing:4px">CODE<span style="color:#ff073a">789</span></div>
+              <button onclick="window.location.href=window.location.href.split('?')[0]" style="font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;padding:8px 16px;border:1px solid rgba(0,245,255,0.4);color:rgba(0,245,255,0.7);background:transparent;cursor:pointer">LOGIN / HOME</button>
+            </div>
+            <div style="background:#0a1420;border:1px solid rgba(0,245,255,0.15);padding:24px;margin-bottom:16px">
+              <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#00f5ff;letter-spacing:2px;margin-bottom:6px">${snippet.projectName}</div>
+              ${snippet.description ? `<div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#8ab4c8;margin-bottom:12px">${snippet.description}</div>` : ''}
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+                <span style="font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border:1px solid rgba(191,90,242,0.4);color:#bf5af2;background:rgba(191,90,242,0.08)">${snippet.language.toUpperCase()}</span>
+                <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a6a7a">shared by ${ownerUser ? ownerUser.username : 'unknown'} · ${snippet.accessed} views</span>
+              </div>
+              ${expired ? `<div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#ffb700;padding:16px;border:1px solid rgba(255,183,0,0.3);background:rgba(255,183,0,0.05)">⚡ CODE EXPIRED — This snippet's 25-minute window has closed. The share link remains valid but the code has been purged.</div>`
+          : destroyed ? `<div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#ff073a;padding:16px;border:1px solid rgba(255,7,58,0.3);background:rgba(255,7,58,0.05)">🔥 CODE DESTROYED — This was a one-time snippet. It has already been accessed. Share link is permanent but code is gone.</div>`
+            : `<div style="background:#020408;border:1px solid rgba(0,245,255,0.12);padding:16px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.6;color:#39ff14;text-shadow:0 0 4px rgba(57,255,20,0.3);overflow-x:auto;white-space:pre-wrap;user-select:none;-webkit-user-select:none">${snippet.code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`}
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a6a7a;text-align:center;letter-spacing:1px">
+              SHARE LINK IS PERMANENT · CODE EXPIRY: ${snippet.expiryType === 'one-time' ? '🔥 ONE-TIME' : snippet.expiryType === '25min' ? '⚡ 25MIN' : '∞ INFINITE'}
+            </div>
+          </div>
+        </div>`;
+      return true;
+    }
+
+    // Initial load — fetch all data from Firestore before first render
+    (async () => {
+      const handled = await handleShareLink();
+      if (!handled) {
+        await loadFromFirebase();
+        render();
+      }
+    })();
   </script>
 </body>
 
