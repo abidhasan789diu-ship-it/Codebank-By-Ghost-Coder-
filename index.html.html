@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --neon-cyan: #00f5ff;
+      --neon-green: #39ff14;
+      --neon-pink: #ff073a;
+      --neon-purple: #bf5af2;
+      --neon-amber: #ffb700;
+      --bg-void: #020408;
+      --bg-deep: #060c12;
+      --bg-panel: #0a1420;
+      --bg-card: #0d1a28;
+      --bg-hover: #112030;
+      --border-dim: rgba(0, 245, 255, 0.15);
+      --border-glow: rgba(0, 245, 255, 0.5);
+      --text-primary: #e8f4f8;
+      --text-secondary: #8ab4c8;
+      --text-dim: #4a6a7a;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg-void);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.08) 2px, rgba(0, 0, 0, 0.08) 4px);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px 40px;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0 16px;
+      border-bottom: 1px solid var(--border-dim);
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px rgba(0, 245, 255, 0.3);
+      letter-spacing: 4px;
+    }
+
+    .logo span {
+      color: var(--neon-pink);
+      text-shadow: 0 0 20px var(--neon-pink);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--neon-green);
+      background: rgba(57, 255, 20, 0.08);
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      padding: 4px 12px;
+      border-radius: 2px;
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+
+    /* BUTTONS */
+    .btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.2s;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      background: transparent;
+    }
+
+    .btn-cyan {
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    .btn-cyan:hover {
+      background: rgba(0, 245, 255, 0.1);
+      box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    }
+
+    .btn-green {
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+
+    .btn-green:hover {
+      background: rgba(57, 255, 20, 0.1);
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+    }
+
+    .btn-pink {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      text-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    .btn-pink:hover {
+      background: rgba(255, 7, 58, 0.1);
+      box-shadow: 0 0 20px rgba(255, 7, 58, 0.3);
+    }
+
+    .btn-amber {
+      border-color: var(--neon-amber);
+      color: var(--neon-amber);
+      text-shadow: 0 0 8px var(--neon-amber);
+    }
+
+    .btn-amber:hover {
+      background: rgba(255, 183, 0, 0.1);
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 9px;
+    }
+
+    .btn-full {
+      width: 100%;
+      display: block;
+      text-align: center;
+    }
+
+    /* NAV TABS */
+    .nav-tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .nav-tab {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 10px 18px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-secondary);
+    }
+
+    .nav-tab.active {
+      color: var(--neon-cyan);
+      border-bottom-color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    /* PANELS */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dim);
+      padding: 24px;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 16px 16px 0;
+      border-color: transparent var(--neon-cyan) transparent transparent;
+      opacity: 0.4;
+    }
+
+    .panel-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 14px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    /* INPUTS */
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-dim);
+      color: var(--text-primary);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+      transition: all 0.2s;
+      -webkit-appearance: none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(0, 245, 255, 0.15);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .field select {
+      cursor: pointer;
+    }
+
+    .field select option {
+      background: var(--bg-deep);
+    }
+
+    .field input[type="password"] {
+      letter-spacing: 4px;
+    }
+
+    /* TWO-COL */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* AUTH SCREEN */
+    .auth-screen {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dim);
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      position: relative;
+    }
+
+    .auth-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 30px var(--neon-cyan), 0 0 60px rgba(0, 245, 255, 0.2);
+      text-align: center;
+      margin-bottom: 4px;
+      letter-spacing: 6px;
+    }
+
+    .auth-logo span {
+      color: var(--neon-pink);
+      text-shadow: 0 0 30px var(--neon-pink);
+    }
+
+    .auth-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      text-align: center;
+      letter-spacing: 4px;
+      margin-bottom: 32px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      border: 1px solid var(--border-dim);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      background: rgba(0, 245, 255, 0.1);
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    /* SNIPPET CARDS */
+    .snippet-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dim);
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .snippet-card:hover {
+      border-color: rgba(0, 245, 255, 0.4);
+      background: var(--bg-hover);
+    }
+
+    .snippet-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .snippet-project {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--neon-cyan);
+    }
+
+    .snippet-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .snippet-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border: 1px solid;
+      text-transform: uppercase;
+    }
+
+    .badge-lang {
+      border-color: rgba(191, 90, 242, 0.4);
+      color: var(--neon-purple);
+      background: rgba(191, 90, 242, 0.08);
+    }
+
+    .badge-onetime {
+      border-color: rgba(255, 7, 58, 0.4);
+      color: var(--neon-pink);
+      background: rgba(255, 7, 58, 0.08);
+    }
+
+    .badge-25min {
+      border-color: rgba(255, 183, 0, 0.4);
+      color: var(--neon-amber);
+      background: rgba(255, 183, 0, 0.08);
+    }
+
+    .badge-infinite {
+      border-color: rgba(57, 255, 20, 0.4);
+      color: var(--neon-green);
+      background: rgba(57, 255, 20, 0.08);
+    }
+
+    .badge-id {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    /* CODE VIEW */
+    .code-display {
+      background: var(--bg-void);
+      border: 1px solid var(--border-dim);
+      padding: 16px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--neon-green);
+      text-shadow: 0 0 4px rgba(57, 255, 20, 0.3);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      user-select: none;
+      -webkit-user-select: none;
+      position: relative;
+      margin-top: 12px;
+    }
+
+    /* SHARE LINK BOX */
+    .share-link-box {
+      background: rgba(0, 245, 255, 0.05);
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .share-link-url {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--neon-cyan);
+      word-break: break-all;
+    }
+
+    /* ALERT */
+    .alert {
+      padding: 12px 16px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      margin-bottom: 16px;
+      border-left: 3px solid;
+    }
+
+    .alert-success {
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      background: rgba(57, 255, 20, 0.05);
+    }
+
+    .alert-error {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      background: rgba(255, 7, 58, 0.05);
+    }
+
+    .alert-info {
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      background: rgba(0, 245, 255, 0.05);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 4, 8, 0.92);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      background: var(--bg-panel);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 40px rgba(0, 245, 255, 0.2);
+      padding: 28px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+      position: relative;
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--neon-cyan);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-close {
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: var(--neon-pink);
+      font-size: 18px;
+    }
+
+    /* STAT ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dim);
+      padding: 14px 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    .stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* USERS TABLE */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-dim);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+    }
+
+    .data-table th {
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .data-table td {
+      color: var(--text-secondary);
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .online-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 6px;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .dot-green {
+      background: var(--neon-green);
+      color: var(--neon-green);
+    }
+
+    .dot-dim {
+      background: var(--text-dim);
+      color: var(--text-dim);
+    }
+
+    /* EDIT REQUEST */
+    .edit-req {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dim);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .edit-req-info {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+    }
+
+    .edit-req-user {
+      color: var(--neon-cyan);
+      font-size: 12px;
+    }
+
+    .edit-req-snippet {
+      color: var(--text-dim);
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .edit-btn-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .platform-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .platform-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      padding: 3px 10px;
+      border: 1px solid rgba(0, 245, 255, 0.2);
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border-dim);
+      margin: 20px 0;
+    }
+
+    .mono {
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .corner-tl {
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid var(--neon-cyan);
+      border-left: 2px solid var(--neon-cyan);
+    }
+
+    .corner-br {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 12px;
+      height: 12px;
+      border-bottom: 2px solid var(--neon-cyan);
+      border-right: 2px solid var(--neon-cyan);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="scanlines"></div>
+  <div class="grid-bg"></div>
+
+  <div class="app" id="root"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDG5_C6rCsaXi1sccuneUEgo4S7aIgTAUw",
+      authDomain: "codebank-d05dc.firebaseapp.com",
+      projectId: "codebank-d05dc",
+      storageBucket: "codebank-d05dc.firebasestorage.app",
+      messagingSenderId: "791883020342",
+      appId: "1:791883020342:web:a3bf8be2835ec1e6edc097",
+      measurementId: "G-2Q9YP3DCBC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const LANGUAGES = ['javascript', 'python', 'c', 'cpp', 'java', 'rust', 'go', 'typescript', 'html', 'css', 'sql', 'bash', 'php', 'ruby', 'swift'];
+    const EXPIRY_TYPES = [
+      { value: 'one-time', label: '🔥 One-Time View', badge: 'onetime', desc: 'Destroyed after first access' },
+      { value: '25min', label: '⚡ 25 Min Auto-Delete', badge: '25min', desc: 'Expires in 25 minutes' },
+      { value: 'infinite', label: '∞ Infinite', badge: 'infinite', desc: 'Lives forever' }
+    ];
+
+    function genId() { return Math.random().toString(36).substr(2, 8).toUpperCase(); }
+    function genUUID() { return [4, 4, 4, 4, 12].map(n => Math.random().toString(36).substr(2, n).toUpperCase()).join('-'); }
+    function now() { return Date.now(); }
+
+    let savedDB = localStorage.getItem("code789_db");
+
+    const DB = savedDB ? JSON.parse(savedDB) : {
+      users: [
+        { id: 'USR-001', username: 'ghost_coder', password: 'cyber123', created: now() - 86400000 * 5, role: 'user' },
+        { id: 'USR-002', username: 'shadow_dev', password: 'shadow99', created: now() - 86400000 * 2, role: 'user' },
+        { id: 'USR-ADM', username: 'admin', password: 'admin789', created: now() - 86400000 * 30, role: 'admin' }
+      ],
+      snippets: [
+        { id: genUUID(), projectName: 'NeuralNet Core', description: 'Main neural network training loop', language: 'python', expiryType: 'infinite', code: 'import torch\nimport torch.nn as nn\n\nclass NeuralNet(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.layers = nn.Sequential(\n            nn.Linear(784, 256),\n            nn.ReLU(),\n            nn.Linear(256, 10)\n        )\n\n    def forward(self, x):\n        return self.layers(x)', ownerId: 'USR-001', created: now() - 3600000 * 2, accessed: 0, editRequests: [] },
+        { id: genUUID(), projectName: 'CryptoVault Auth', description: 'JWT token generation module', language: 'javascript', expiryType: '25min', code: 'const jwt = require("jsonwebtoken");\n\nfunction generateToken(userId, secret) {\n  return jwt.sign(\n    { id: userId, iat: Date.now() },\n    secret,\n    { expiresIn: "24h" }\n  );\n}', ownerId: 'USR-002', created: now() - 3600000 * 48, accessed: 3, editRequests: [], expiresAt: now() + 60000 * 25 },
+        { id: genUUID(), projectName: 'GhostShell', description: 'Stealth network probe utility', language: 'bash', expiryType: 'one-time', code: '#!/bin/bash\necho ">> Initializing ghost probe..."\nfor port in 22 80 443 8080; do\n  nc -zv $1 $port 2>&1 | grep -q "succeeded" && echo "OPEN: $port"\ndone\necho ">> Scan complete."', ownerId: 'USR-001', created: now() - 3600000, accessed: 0, editRequests: [{ from: 'USR-002', fromName: 'shadow_dev', msg: 'Need edit access for testing', time: now() - 1800000 }] }
+      ],
+      editRequests: []
+    };
+
+    function saveDB() {
+      localStorage.setItem("code789_db", JSON.stringify(DB));
+    }
+    let STATE = {
+      view: 'auth',
+      authTab: 'login',
+      currentUser: null,
+      activeTab: 'dashboard',
+      modal: null,
+      alert: null,
+      loginForm: { username: '', password: '' },
+      registerForm: { username: '', password: '', confirm: '' },
+      newSnippet: { projectName: '', description: '', language: 'python', expiryType: 'infinite', code: '' },
+      shareResult: null,
+      viewSnippetId: '',
+      viewedSnippet: null,
+      editReqMsg: ''
+    };
+
+    function setState(patch) {
+      Object.assign(STATE, patch);
+      render();
+    }
+
+    function showAlert(type, msg) {
+      setState({ alert: { type, msg } });
+      setTimeout(() => setState({ alert: null }), 3500);
+    }
+
+    function getSnippetsByUser(uid) {
+      return DB.snippets.filter(s => s.ownerId === uid);
+    }
+
+    function handleLogin() {
+      const { username, password } = STATE.loginForm;
+      const user = DB.users.find(u => u.username === username && u.password === password);
+      if (!user) { showAlert('error', '[ACCESS DENIED] Invalid credentials'); return; }
+      setState({ currentUser: user, view: 'app', activeTab: 'dashboard', alert: null });
+    }
+
+    function handleRegister() {
+      const { username, password, confirm } = STATE.registerForm;
+
+      if (!username || !password) {
+        showAlert('error', '[ERROR] Username and password required');
+        return;
+      }
+
+      if (password !== confirm) {
+        showAlert('error', '[ERROR] Passwords do not match');
+        return;
+      }
+
+      if (DB.users.find(u => u.username === username)) {
+        showAlert('error', '[ERROR] Username already exists');
+        return;
+      }
+
+      const user = {
+        id: 'USR-' + genId(),
+        username,
+        password,
+        created: now(),
+        role: 'user'
+      };
+
+      DB.users.push(user);
+      db.collection("users").doc(user.id).set(user);
+      saveDB();
+
+      setState({
+        currentUser: user,
+        view: 'app',
+        activeTab: 'dashboard',
+        alert: null
+      });
+    }
+
+    function handleCreateSnippet() {
+      const { projectName, description, language, expiryType, code } = STATE.newSnippet;
+      if (!projectName || !code) { showAlert('error', '[ERROR] Project name and code required'); return; }
+      const id = genUUID();
+      const snippet = {
+        id, projectName, description, language, expiryType, code,
+        ownerId: STATE.currentUser.id,
+        created: now(),
+        accessed: 0,
+        editRequests: [],
+        expiresAt: expiryType === '25min' ? now() + 25 * 60 * 1000 : null
+      };
+      DB.snippets.push(snippet);
+      saveDB();
+      const shareUrl = `${window.location.origin}/s/${id}`;
+      setState({ shareResult: { id, url: shareUrl, expiryType }, newSnippet: { projectName: '', description: '', language: 'python', expiryType: 'infinite', code: '' } });
+      showAlert('success', '[SUCCESS] Snippet encrypted and uploaded to the grid');
+    }
+
+    function handleViewSnippet() {
+      const id = STATE.viewSnippetId.trim().toUpperCase();
+      const snippet = DB.snippets.find(s => s.id === id);
+      if (!snippet) { showAlert('error', '[404] Snippet not found on the grid'); setState({ viewedSnippet: null }); return; }
+      if (snippet.expiryType === '25min' && snippet.expiresAt && now() > snippet.expiresAt) {
+        showAlert('error', '[EXPIRED] This snippet has been purged from memory'); setState({ viewedSnippet: null }); return;
+      }
+      if (snippet.expiryType === 'one-time' && snippet.accessed > 0 && snippet.ownerId !== STATE.currentUser.id) {
+        showAlert('error', '[DESTROYED] One-time snippet already accessed. Data wiped.'); setState({ viewedSnippet: null }); return;
+      }
+      if (snippet.ownerId !== STATE.currentUser.id) snippet.accessed++;
+      saveDB();
+      setState({ viewedSnippet: snippet });
+    }
+
+    function handleEditRequest(snippetId) {
+      const snippet = DB.snippets.find(s => s.id === snippetId);
+      if (!snippet) return;
+      if (!STATE.editReqMsg.trim()) { showAlert('error', '[ERROR] Request message required'); return; }
+      snippet.editRequests.push({
+        from: STATE.currentUser.id,
+        fromName: STATE.currentUser.username,
+        msg: STATE.editReqMsg,
+        time: now()
+      });
+      saveDB();
+      showAlert('success', '[SENT] Edit permission request transmitted');
+      setState({ modal: null, editReqMsg: '' });
+    }
+
+    function handleApproveEdit(snippetId, reqIdx) {
+      const snippet = DB.snippets.find(s => s.id === snippetId);
+      if (snippet) snippet.editRequests.splice(reqIdx, 1);
+      saveDB();
+      showAlert('success', '[GRANTED] Edit access approved');
+      render();
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard?.writeText(text).catch(() => { });
+      showAlert('success', '[COPIED] Data copied to buffer');
+    }
+
+    function formatTime(ts) {
+      const d = now() - ts;
+      if (d < 60000) return 'just now';
+      if (d < 3600000) return Math.floor(d / 60000) + 'm ago';
+      if (d < 86400000) return Math.floor(d / 3600000) + 'h ago';
+      return Math.floor(d / 86400000) + 'd ago';
+    }
+
+    function getBadgeClass(expiryType) {
+      return 'badge badge-' + (expiryType === 'one-time' ? 'onetime' : expiryType);
+    }
+    function getExpiryLabel(et) {
+      return et === 'one-time' ? '🔥 ONE-TIME' : et === '25min' ? '⚡ 25MIN' : '∞ INFINITE';
+    }
+
+    function renderAlert() {
+      if (!STATE.alert) return '';
+      return `<div class="alert alert-${STATE.alert.type}" style="margin-bottom:16px">${STATE.alert.msg}</div>`;
+    }
+
+    function renderAuth() {
+      return `
+  <div class="auth-screen">
+    <div class="auth-box">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="auth-logo">CODE<span>789</span></div>
+      <div class="auth-sub">// SECURE CODE VAULT SYSTEM v2.4.1</div>
+      ${renderAlert()}
+      <div class="auth-tabs">
+        <button class="auth-tab ${STATE.authTab === 'login' ? 'active' : ''}" onclick="setState({authTab:'login'})">LOGIN</button>
+        <button class="auth-tab ${STATE.authTab === 'register' ? 'active' : ''}" onclick="setState({authTab:'register'})">CREATE ACCOUNT</button>
+      </div>
+      ${STATE.authTab === 'login' ? `
+        <div class="field">
+          <label>// User ID</label>
+          <input type="text" placeholder="enter username" value="${STATE.loginForm.username}" oninput="STATE.loginForm.username=this.value" />
+        </div>
+        <div class="field">
+          <label>// Access Key</label>
+          <input type="password" placeholder="••••••••" value="${STATE.loginForm.password}" oninput="STATE.loginForm.password=this.value" onkeydown="if(event.key==='Enter')handleLogin()" />
+        </div>
+        <button class="btn btn-cyan btn-full" onclick="handleLogin()">INITIALIZE SESSION</button>
+        <div style="text-align:center;margin-top:14px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">
+          Try: admin / admin789 — ghost_coder / cyber123
+        </div>
+      ` : `
+        <div class="field">
+          <label>// New User ID</label>
+          <input type="text" placeholder="choose username" value="${STATE.registerForm.username}" oninput="STATE.registerForm.username=this.value" />
+        </div>
+        <div class="field">
+          <label>// Access Key</label>
+          <input type="password" placeholder="min 6 chars" value="${STATE.registerForm.password}" oninput="STATE.registerForm.password=this.value" />
+        </div>
+        <div class="field">
+          <label>// Confirm Key</label>
+          <input type="password" placeholder="repeat password" value="${STATE.registerForm.confirm}" oninput="STATE.registerForm.confirm=this.value" onkeydown="if(event.key==='Enter')handleRegister()" />
+        </div>
+        <button class="btn btn-green btn-full" onclick="handleRegister()">CREATE IDENTITY</button>
+      `}
+    </div>
+  </div>`;
+    }
+
+    function renderDashboard() {
+      const mySnippets = getSnippetsByUser(STATE.currentUser.id);
+      const myPending = DB.snippets.filter(s => s.ownerId === STATE.currentUser.id && s.editRequests.length > 0);
+      const totalAccesses = mySnippets.reduce((a, s) => a + s.accessed, 0);
+      return `
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">${mySnippets.length}</div><div class="stat-label">Snippets</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--neon-pink);text-shadow:0 0 10px var(--neon-pink)">${myPending.reduce((a, s) => a + s.editRequests.length, 0)}</div><div class="stat-label">Edit Requests</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--neon-green);text-shadow:0 0 10px var(--neon-green)">${totalAccesses}</div><div class="stat-label">Total Accesses</div></div>
+    </div>
+
+    ${myPending.length > 0 ? `
+    <div class="panel" style="border-color:rgba(255,7,58,0.3)">
+      <div class="panel-title" style="color:var(--neon-pink)"><span style="width:3px;height:14px;background:var(--neon-pink);box-shadow:0 0 8px var(--neon-pink);display:block"></span>PENDING EDIT REQUESTS</div>
+      ${myPending.map(snippet => snippet.editRequests.map((req, ri) => `
+        <div class="edit-req">
+          <div class="edit-req-info">
+            <div class="edit-req-user">${req.fromName}</div>
+            <div class="edit-req-snippet">${snippet.projectName} · ${formatTime(req.time)}</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:4px">"${req.msg}"</div>
+          </div>
+          <div class="edit-btn-row">
+            <button class="btn btn-green btn-sm" onclick="handleApproveEdit('${snippet.id}',${ri})">GRANT</button>
+            <button class="btn btn-pink btn-sm" onclick="DB.snippets.find(s=>s.id==='${snippet.id}').editRequests.splice(${ri},1);saveDB();render()">DENY</button>
+          </div>
+        </div>
+      `).join('')).join('')}
+    </div>` : ''}
+
+    <div class="panel">
+      <div class="panel-title">MY SNIPPET VAULT</div>
+      ${mySnippets.length === 0 ? `<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:12px;text-align:center;padding:30px">// No snippets uploaded. Create your first one.</div>` : mySnippets.map(s => `
+        <div class="snippet-card" onclick="setState({modal:{type:'view',snippet:s}})">
+          <div class="snippet-card-header">
+            <div class="snippet-project">${s.projectName}</div>
+            <span class="${getBadgeClass(s.expiryType)}">${getExpiryLabel(s.expiryType)}</span>
+          </div>
+          <div class="snippet-desc">${s.description || '// no description'}</div>
+          <div class="snippet-meta">
+            <span class="badge badge-lang">${s.language}</span>
+            <span class="badge-id">ID: ${s.id.split('-')[0]}</span>
+            <span class="badge-id">· ${formatTime(s.created)}</span>
+            <span class="badge-id">· ${s.accessed} views</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+    }
+
+    function renderCreate() {
+      return `
+    <div class="panel">
+      <div class="panel-title">UPLOAD NEW SNIPPET</div>
+      ${renderAlert()}
+      ${STATE.shareResult ? `
+        <div class="alert alert-success">// Snippet encrypted and stored successfully</div>
+        <div class="share-link-box">
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px">SHARE URL</div>
+            <div class="share-link-url">${STATE.shareResult.url}</div>
+          </div>
+          <button class="btn btn-cyan btn-sm" onclick="copyToClipboard('${STATE.shareResult.url}')">COPY</button>
+        </div>
+        <div style="margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim)">
+          SNIPPET ID: <span style="color:var(--neon-cyan)">${STATE.shareResult.id}</span>
+          &nbsp;·&nbsp; TYPE: <span style="color:${STATE.shareResult.expiryType === 'one-time' ? 'var(--neon-pink)' : STATE.shareResult.expiryType === '25min' ? 'var(--neon-amber)' : 'var(--neon-green)'}">${getExpiryLabel(STATE.shareResult.expiryType)}</span>
+        </div>
+        <hr class="divider">
+        <button class="btn btn-cyan" onclick="setState({shareResult:null})">+ NEW SNIPPET</button>
+      ` : `
+        <div class="grid-2">
+          <div class="field">
+            <label>// Project Name</label>
+            <input type="text" placeholder="e.g. CryptoVault Auth" value="${STATE.newSnippet.projectName}" oninput="STATE.newSnippet.projectName=this.value" />
+          </div>
+          <div class="field">
+            <label>// Description</label>
+            <input type="text" placeholder="brief description..." value="${STATE.newSnippet.description}" oninput="STATE.newSnippet.description=this.value" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>// Language</label>
+            <select oninput="STATE.newSnippet.language=this.value">
+              ${LANGUAGES.map(l => `<option value="${l}" ${STATE.newSnippet.language === l ? 'selected' : ''}>${l}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label>// Expiry Mode</label>
+            <select oninput="STATE.newSnippet.expiryType=this.value">
+              ${EXPIRY_TYPES.map(e => `<option value="${e.value}" ${STATE.newSnippet.expiryType === e.value ? 'selected' : ''}>${e.label}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>// Code Payload</label>
+          <textarea placeholder="// paste your code here..." oninput="STATE.newSnippet.code=this.value" style="min-height:200px;color:var(--neon-green);font-size:13px">${STATE.newSnippet.code}</textarea>
+        </div>
+        ${STATE.newSnippet.expiryType === 'one-time' ? `<div class="alert alert-info">// WARNING: This snippet will be permanently destroyed after the first access.</div>` : ''}
+        ${STATE.newSnippet.expiryType === '25min' ? `<div class="alert" style="border-color:var(--neon-amber);color:var(--neon-amber);background:rgba(255,183,0,0.05)">// WARNING: This snippet will auto-purge from the grid in 25 minutes.</div>` : ''}
+        <button class="btn btn-cyan btn-full" style="margin-top:8px" onclick="handleCreateSnippet()">ENCRYPT & UPLOAD TO GRID</button>
+      `}
+    </div>
+  `;
+    }
+
+    function renderViewer() {
+      return `
+    <div class="panel">
+      <div class="panel-title">SNIPPET VIEWER</div>
+      ${renderAlert()}
+      <div class="field">
+        <label>// Snippet ID</label>
+        <div style="display:flex;gap:10px">
+          <input type="text" placeholder="e.g. A1B2C3D4-E5F6-..." value="${STATE.viewSnippetId}" oninput="STATE.viewSnippetId=this.value.toUpperCase()" style="flex:1" onkeydown="if(event.key==='Enter')handleViewSnippet()" />
+          <button class="btn btn-cyan" onclick="handleViewSnippet()">RETRIEVE</button>
+        </div>
+      </div>
+      ${STATE.viewedSnippet ? (() => {
+          const s = STATE.viewedSnippet;
+          return `
+          <hr class="divider">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+            <div>
+              <div class="snippet-project" style="font-size:14px;margin-bottom:4px">${s.projectName}</div>
+              <div class="snippet-desc">${s.description || '// no description'}</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span class="badge badge-lang">${s.language}</span>
+              <span class="${getBadgeClass(s.expiryType)}">${getExpiryLabel(s.expiryType)}</span>
+              ${s.ownerId !== STATE.currentUser.id ? `<button class="btn btn-amber btn-sm" onclick="setState({modal:{type:'editreq',snippet:s}})">REQUEST EDIT</button>` : ''}
+            </div>
+          </div>
+          <div class="code-display" oncontextmenu="return false">${escapeHtml(s.code)}</div>
+          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+            ${s.ownerId === STATE.currentUser.id ? `<button class="btn btn-cyan btn-sm" onclick="copyToClipboard(DB.snippets.find(x=>x.id==='${s.id}').code||'')">COPY CODE</button>` : ''}
+            <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);align-self:center">ACCESSED: ${s.accessed} times · ID: ${s.id.split('-')[0]}</span>
+          </div>
+        `;
+        })() : ''}
+    </div>
+  `;
+    }
+
+    function renderUsers() {
+      if (STATE.currentUser.role !== 'admin') return `<div class="alert alert-error">// ACCESS DENIED: Admin clearance required</div>`;
+      const totalSnippets = DB.snippets.length;
+      const totalAccesses = DB.snippets.reduce((a, s) => a + s.accessed, 0);
+      return `
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">${DB.users.length}</div><div class="stat-label">Users</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--neon-purple);text-shadow:0 0 10px var(--neon-purple)">${totalSnippets}</div><div class="stat-label">Snippets</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--neon-amber);text-shadow:0 0 10px var(--neon-amber)">${totalAccesses}</div><div class="stat-label">Total Accesses</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">USER REGISTRY</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Status</th><th>User ID</th><th>Username</th><th>Role</th><th>Snippets</th><th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${DB.users.map(u => `
+            <tr>
+              <td><span class="online-dot ${u.id === STATE.currentUser.id ? 'dot-green' : 'dot-dim'}"></span>${u.id === STATE.currentUser.id ? 'ONLINE' : 'OFFLINE'}</td>
+              <td style="color:var(--neon-cyan)">${u.id}</td>
+              <td style="color:var(--text-primary)">${u.username}</td>
+              <td><span class="badge ${u.role === 'admin' ? 'badge-onetime' : 'badge-lang'}">${u.role.toUpperCase()}</span></td>
+              <td>${DB.snippets.filter(s => s.ownerId === u.id).length}</td>
+              <td>${formatTime(u.created)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="panel-title">ALL SNIPPETS</div>
+      ${DB.snippets.map(s => {
+        const owner = DB.users.find(u => u.id === s.ownerId);
+        return `
+          <div class="snippet-card">
+            <div class="snippet-card-header">
+              <div class="snippet-project">${s.projectName}</div>
+              <span class="${getBadgeClass(s.expiryType)}">${getExpiryLabel(s.expiryType)}</span>
+            </div>
+            <div class="snippet-meta">
+              <span class="badge badge-lang">${s.language}</span>
+              <span class="badge-id">owner: ${owner ? owner.username : 'unknown'}</span>
+              <span class="badge-id">· ${s.accessed} views · ${formatTime(s.created)}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+    }
+
+    function renderModal() {
+      if (!STATE.modal) return '';
+      const m = STATE.modal;
+      if (m.type === 'view') {
+        const s = m.snippet;
+        return `
+      <div class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay'))setState({modal:null})">
+        <div class="modal">
+          <div class="modal-title">
+            <span>SNIPPET DETAILS</span>
+            <button class="modal-close" onclick="setState({modal:null})">✕</button>
+          </div>
+          <div class="field" style="margin-bottom:8px"><label>Project</label><div class="mono" style="font-size:15px;color:var(--neon-cyan)">${s.projectName}</div></div>
+          <div class="field" style="margin-bottom:8px"><label>Description</label><div class="mono" style="font-size:12px;color:var(--text-secondary)">${s.description || 'none'}</div></div>
+          <div class="grid-3" style="margin-bottom:12px">
+            <div><label style="font-family:'Share Tech Mono';font-size:9px;color:var(--text-dim);letter-spacing:2px">LANGUAGE</label><div><span class="badge badge-lang">${s.language}</span></div></div>
+            <div><label style="font-family:'Share Tech Mono';font-size:9px;color:var(--text-dim);letter-spacing:2px">EXPIRY</label><div><span class="${getBadgeClass(s.expiryType)}">${getExpiryLabel(s.expiryType)}</span></div></div>
+            <div><label style="font-family:'Share Tech Mono';font-size:9px;color:var(--text-dim);letter-spacing:2px">ACCESSES</label><div style="font-family:'Share Tech Mono';font-size:12px;color:var(--text-primary)">${s.accessed}</div></div>
+          </div>
+          <div class="code-display" oncontextmenu="return false" style="max-height:200px;overflow-y:auto">${escapeHtml(s.code)}</div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-cyan btn-sm" onclick="copyToClipboard(window.location.origin + '/s/${s.id}')">COPY SHARE URL</button>
+            <button class="btn btn-cyan btn-sm" onclick="copyToClipboard('${s.id}')">COPY ID</button>
+            ${s.editRequests.length > 0 ? `<span style="font-family:'Share Tech Mono';font-size:10px;color:var(--neon-pink);align-self:center">${s.editRequests.length} edit request(s) pending</span>` : ''}
+          </div>
+          ${s.editRequests.length > 0 ? `
+            <hr class="divider">
+            <div style="font-family:'Share Tech Mono';font-size:10px;color:var(--neon-pink);letter-spacing:2px;margin-bottom:10px">PENDING EDIT REQUESTS</div>
+            ${s.editRequests.map((r, ri) => `
+              <div class="edit-req">
+                <div class="edit-req-info">
+                  <div class="edit-req-user">${r.fromName}</div>
+                  <div style="font-size:10px;color:var(--text-secondary);margin-top:3px">"${r.msg}"</div>
+                </div>
+                <div class="edit-btn-row">
+                  <button class="btn btn-green btn-sm" onclick="handleApproveEdit('${s.id}',${ri});setState({modal:null})">GRANT</button>
+                  <button class="btn btn-pink btn-sm" onclick="DB.snippets.find(x=>x.id==='${s.id}').editRequests.splice(${ri},1);saveDB();render()">DENY</button>
+                </div>
+              </div>
+            `).join('')}
+          ` : ''}
+        </div>
+      </div>`;
+      }
+      if (m.type === 'editreq') {
+        const s = m.snippet;
+        return `
+      <div class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay'))setState({modal:null})">
+        <div class="modal">
+          <div class="modal-title">
+            <span>REQUEST EDIT ACCESS</span>
+            <button class="modal-close" onclick="setState({modal:null})">✕</button>
+          </div>
+          <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);margin-bottom:16px">
+            Requesting edit permission for: <span style="color:var(--neon-cyan)">${s.projectName}</span>
+          </div>
+          <div class="field">
+            <label>// Request Message</label>
+            <textarea placeholder="// explain why you need edit access..." oninput="STATE.editReqMsg=this.value" style="min-height:80px">${STATE.editReqMsg}</textarea>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn btn-amber" onclick="handleEditRequest('${s.id}')">TRANSMIT REQUEST</button>
+            <button class="btn btn-pink" onclick="setState({modal:null})">CANCEL</button>
+          </div>
+        </div>
+      </div>`;
+      }
+      return '';
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderApp() {
+      const tabs = [
+        { id: 'dashboard', label: 'DASHBOARD' },
+        { id: 'create', label: 'NEW SNIPPET' },
+        { id: 'viewer', label: 'VIEW CODE' },
+        ...(STATE.currentUser.role === 'admin' ? [{ id: 'users', label: 'USER CONTROL' }] : [])
+      ];
+      let content = '';
+      if (STATE.activeTab === 'dashboard') content = renderDashboard();
+      else if (STATE.activeTab === 'create') content = renderCreate();
+      else if (STATE.activeTab === 'viewer') content = renderViewer();
+      else if (STATE.activeTab === 'users') content = renderUsers();
+
+      return `
+    ${renderModal()}
+    <div class="header">
+      <div class="logo">CODE<span>789</span></div>
+      <div class="header-right">
+        <div class="platform-row">
+          <span class="platform-badge">WEB</span>
+          <span class="platform-badge">ANDROID</span>
+          <span class="platform-badge">MacOS</span>
+        </div>
+        <div class="user-badge">// ${STATE.currentUser.username} · ${STATE.currentUser.role.toUpperCase()}</div>
+        <button class="btn btn-pink btn-sm" onclick="setState({view:'auth',currentUser:null,viewedSnippet:null,shareResult:null})">LOGOUT</button>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      ${tabs.map(t => `<button class="nav-tab ${STATE.activeTab === t.id ? 'active' : ''}" onclick="setState({activeTab:'${t.id}',shareResult:null,viewedSnippet:null,alert:null})">${t.label}</button>`).join('')}
+    </div>
+    ${content}
+  `;
+    }
+
+    function render() {
+      const root = document.getElementById('root');
+      root.innerHTML = STATE.view === 'auth' ? renderAuth() : renderApp();
+    }
+
+    document.addEventListener('contextmenu', e => {
+      const el = e.target.closest('.code-display');
+      if (el) e.preventDefault();
+    });
+
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && ['p', 's'].includes(e.key.toLowerCase())) {
+        const el = document.querySelector('.code-display');
+        if (el) e.preventDefault();
+      }
+    });
+
+    render();
+  </script>
+</body>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+</html>
