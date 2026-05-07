@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
-
+ 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
-
+ 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
+ 
     :root {
       --neon-cyan: #00f5ff;
       --neon-green: #39ff14;
@@ -30,7 +30,7 @@
       --text-secondary: #8ab4c8;
       --text-dim: #4a6a7a;
     }
-
+ 
     body {
       font-family: 'Rajdhani', sans-serif;
       background: var(--bg-void);
@@ -38,7 +38,7 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
+ 
     .scanlines {
       position: fixed;
       top: 0;
@@ -49,7 +49,26 @@
       pointer-events: none;
       z-index: 1000;
     }
-
+ 
+    /* Screenshot / screen-record blocker overlay */
+    @media print {
+      .code-display { visibility: hidden !important; }
+      .code-display::after { content: '[CODE PROTECTED]'; visibility: visible; color: #ff073a; }
+    }
+    .code-shield {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(0,245,255,0.015) 0px,
+        rgba(0,245,255,0.015) 1px,
+        transparent 1px,
+        transparent 8px
+      );
+    }
+ 
     .grid-bg {
       position: fixed;
       top: 0;
@@ -61,7 +80,7 @@
       pointer-events: none;
       z-index: 0;
     }
-
+ 
     .app {
       position: relative;
       z-index: 1;
@@ -69,7 +88,7 @@
       margin: 0 auto;
       padding: 0 16px 40px;
     }
-
+ 
     /* HEADER */
     .header {
       display: flex;
@@ -79,7 +98,7 @@
       border-bottom: 1px solid var(--border-dim);
       margin-bottom: 24px;
     }
-
+ 
     .logo {
       font-family: 'Orbitron', monospace;
       font-size: 22px;
@@ -88,18 +107,18 @@
       text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px rgba(0, 245, 255, 0.3);
       letter-spacing: 4px;
     }
-
+ 
     .logo span {
       color: var(--neon-pink);
       text-shadow: 0 0 20px var(--neon-pink);
     }
-
+ 
     .header-right {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
+ 
     .user-badge {
       font-family: 'Share Tech Mono', monospace;
       font-size: 11px;
@@ -110,7 +129,7 @@
       border-radius: 2px;
       text-shadow: 0 0 8px var(--neon-green);
     }
-
+ 
     /* BUTTONS */
     .btn {
       font-family: 'Orbitron', monospace;
@@ -125,61 +144,61 @@
       clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
       background: transparent;
     }
-
+ 
     .btn-cyan {
       border-color: var(--neon-cyan);
       color: var(--neon-cyan);
       text-shadow: 0 0 8px var(--neon-cyan);
     }
-
+ 
     .btn-cyan:hover {
       background: rgba(0, 245, 255, 0.1);
       box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
     }
-
+ 
     .btn-green {
       border-color: var(--neon-green);
       color: var(--neon-green);
       text-shadow: 0 0 8px var(--neon-green);
     }
-
+ 
     .btn-green:hover {
       background: rgba(57, 255, 20, 0.1);
       box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
     }
-
+ 
     .btn-pink {
       border-color: var(--neon-pink);
       color: var(--neon-pink);
       text-shadow: 0 0 8px var(--neon-pink);
     }
-
+ 
     .btn-pink:hover {
       background: rgba(255, 7, 58, 0.1);
       box-shadow: 0 0 20px rgba(255, 7, 58, 0.3);
     }
-
+ 
     .btn-amber {
       border-color: var(--neon-amber);
       color: var(--neon-amber);
       text-shadow: 0 0 8px var(--neon-amber);
     }
-
+ 
     .btn-amber:hover {
       background: rgba(255, 183, 0, 0.1);
     }
-
+ 
     .btn-sm {
       padding: 6px 14px;
       font-size: 9px;
     }
-
+ 
     .btn-full {
       width: 100%;
       display: block;
       text-align: center;
     }
-
+ 
     /* NAV TABS */
     .nav-tabs {
       display: flex;
@@ -187,7 +206,7 @@
       margin-bottom: 24px;
       border-bottom: 1px solid var(--border-dim);
     }
-
+ 
     .nav-tab {
       font-family: 'Orbitron', monospace;
       font-size: 9px;
@@ -202,17 +221,17 @@
       border-bottom: 2px solid transparent;
       margin-bottom: -1px;
     }
-
+ 
     .nav-tab:hover {
       color: var(--text-secondary);
     }
-
+ 
     .nav-tab.active {
       color: var(--neon-cyan);
       border-bottom-color: var(--neon-cyan);
       text-shadow: 0 0 8px var(--neon-cyan);
     }
-
+ 
     /* PANELS */
     .panel {
       background: var(--bg-panel);
@@ -222,7 +241,7 @@
       margin-bottom: 20px;
       position: relative;
     }
-
+ 
     .panel::before {
       content: '';
       position: absolute;
@@ -235,7 +254,7 @@
       border-color: transparent var(--neon-cyan) transparent transparent;
       opacity: 0.4;
     }
-
+ 
     .panel-title {
       font-family: 'Orbitron', monospace;
       font-size: 11px;
@@ -248,7 +267,7 @@
       align-items: center;
       gap: 10px;
     }
-
+ 
     .panel-title::before {
       content: '';
       display: block;
@@ -257,12 +276,12 @@
       background: var(--neon-cyan);
       box-shadow: 0 0 8px var(--neon-cyan);
     }
-
+ 
     /* INPUTS */
     .field {
       margin-bottom: 16px;
     }
-
+ 
     .field label {
       display: block;
       font-family: 'Share Tech Mono', monospace;
@@ -272,7 +291,7 @@
       text-transform: uppercase;
       margin-bottom: 6px;
     }
-
+ 
     .field input,
     .field select,
     .field textarea {
@@ -287,44 +306,44 @@
       transition: all 0.2s;
       -webkit-appearance: none;
     }
-
+ 
     .field input:focus,
     .field select:focus,
     .field textarea:focus {
       border-color: var(--neon-cyan);
       box-shadow: 0 0 12px rgba(0, 245, 255, 0.15);
     }
-
+ 
     .field textarea {
       resize: vertical;
       min-height: 120px;
     }
-
+ 
     .field select {
       cursor: pointer;
     }
-
+ 
     .field select option {
       background: var(--bg-deep);
     }
-
+ 
     .field input[type="password"] {
       letter-spacing: 4px;
     }
-
+ 
     /* TWO-COL */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-
+ 
     .grid-3 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 16px;
     }
-
+ 
     /* AUTH SCREEN */
     .auth-screen {
       min-height: 90vh;
@@ -332,7 +351,7 @@
       align-items: center;
       justify-content: center;
     }
-
+ 
     .auth-box {
       background: var(--bg-panel);
       border: 1px solid var(--border-dim);
@@ -342,7 +361,7 @@
       clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
       position: relative;
     }
-
+ 
     .auth-logo {
       font-family: 'Orbitron', monospace;
       font-size: 28px;
@@ -353,12 +372,12 @@
       margin-bottom: 4px;
       letter-spacing: 6px;
     }
-
+ 
     .auth-logo span {
       color: var(--neon-pink);
       text-shadow: 0 0 30px var(--neon-pink);
     }
-
+ 
     .auth-sub {
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
@@ -367,14 +386,14 @@
       letter-spacing: 4px;
       margin-bottom: 32px;
     }
-
+ 
     .auth-tabs {
       display: flex;
       gap: 0;
       margin-bottom: 28px;
       border: 1px solid var(--border-dim);
     }
-
+ 
     .auth-tab {
       flex: 1;
       padding: 10px;
@@ -388,13 +407,13 @@
       color: var(--text-dim);
       transition: all 0.2s;
     }
-
+ 
     .auth-tab.active {
       background: rgba(0, 245, 255, 0.1);
       color: var(--neon-cyan);
       text-shadow: 0 0 8px var(--neon-cyan);
     }
-
+ 
     /* SNIPPET CARDS */
     .snippet-card {
       background: var(--bg-card);
@@ -405,19 +424,19 @@
       transition: all 0.2s;
       position: relative;
     }
-
+ 
     .snippet-card:hover {
       border-color: rgba(0, 245, 255, 0.4);
       background: var(--bg-hover);
     }
-
+ 
     .snippet-card-header {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       margin-bottom: 8px;
     }
-
+ 
     .snippet-project {
       font-family: 'Orbitron', monospace;
       font-size: 11px;
@@ -425,20 +444,20 @@
       letter-spacing: 1px;
       color: var(--neon-cyan);
     }
-
+ 
     .snippet-desc {
       font-size: 12px;
       color: var(--text-secondary);
       margin-bottom: 10px;
       font-family: 'Share Tech Mono', monospace;
     }
-
+ 
     .snippet-meta {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
-
+ 
     .badge {
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
@@ -447,56 +466,67 @@
       border: 1px solid;
       text-transform: uppercase;
     }
-
+ 
     .badge-lang {
       border-color: rgba(191, 90, 242, 0.4);
       color: var(--neon-purple);
       background: rgba(191, 90, 242, 0.08);
     }
-
+ 
     .badge-onetime {
       border-color: rgba(255, 7, 58, 0.4);
       color: var(--neon-pink);
       background: rgba(255, 7, 58, 0.08);
     }
-
+ 
     .badge-25min {
       border-color: rgba(255, 183, 0, 0.4);
       color: var(--neon-amber);
       background: rgba(255, 183, 0, 0.08);
     }
-
+ 
     .badge-infinite {
       border-color: rgba(57, 255, 20, 0.4);
       color: var(--neon-green);
       background: rgba(57, 255, 20, 0.08);
     }
-
+ 
     .badge-id {
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
       color: var(--text-dim);
       letter-spacing: 1px;
     }
-
+ 
     /* CODE VIEW */
     .code-display {
       background: var(--bg-void);
       border: 1px solid var(--border-dim);
       padding: 16px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 12px;
-      line-height: 1.6;
-      color: var(--neon-green);
-      text-shadow: 0 0 4px rgba(57, 255, 20, 0.3);
+      font-size: 13px;
+      line-height: 1.7;
+      color: #e8f4f8;
+      text-shadow: none;
       overflow-x: auto;
       white-space: pre-wrap;
       user-select: none;
       -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
       position: relative;
       margin-top: 12px;
     }
-
+ 
+    /* Anti-screenshot: blur code when window loses focus */
+    .code-display.protected {
+      filter: none;
+      transition: filter 0.15s;
+    }
+    body.unfocused .code-display.protected {
+      filter: blur(8px);
+    }
+ 
     /* SHARE LINK BOX */
     .share-link-box {
       background: rgba(0, 245, 255, 0.05);
@@ -508,14 +538,14 @@
       gap: 12px;
       margin-top: 16px;
     }
-
+ 
     .share-link-url {
       font-family: 'Share Tech Mono', monospace;
       font-size: 11px;
       color: var(--neon-cyan);
       word-break: break-all;
     }
-
+ 
     /* ALERT */
     .alert {
       padding: 12px 16px;
@@ -524,25 +554,25 @@
       margin-bottom: 16px;
       border-left: 3px solid;
     }
-
+ 
     .alert-success {
       border-color: var(--neon-green);
       color: var(--neon-green);
       background: rgba(57, 255, 20, 0.05);
     }
-
+ 
     .alert-error {
       border-color: var(--neon-pink);
       color: var(--neon-pink);
       background: rgba(255, 7, 58, 0.05);
     }
-
+ 
     .alert-info {
       border-color: var(--neon-cyan);
       color: var(--neon-cyan);
       background: rgba(0, 245, 255, 0.05);
     }
-
+ 
     /* MODAL */
     .modal-overlay {
       position: fixed;
@@ -557,7 +587,7 @@
       justify-content: center;
       padding: 20px;
     }
-
+ 
     .modal {
       background: var(--bg-panel);
       border: 1px solid var(--neon-cyan);
@@ -570,7 +600,7 @@
       clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
       position: relative;
     }
-
+ 
     .modal-title {
       font-family: 'Orbitron', monospace;
       font-size: 12px;
@@ -582,7 +612,7 @@
       align-items: center;
       justify-content: space-between;
     }
-
+ 
     .modal-close {
       cursor: pointer;
       background: none;
@@ -590,7 +620,7 @@
       color: var(--neon-pink);
       font-size: 18px;
     }
-
+ 
     /* STAT ROW */
     .stats-row {
       display: grid;
@@ -598,14 +628,14 @@
       gap: 12px;
       margin-bottom: 24px;
     }
-
+ 
     .stat-card {
       background: var(--bg-card);
       border: 1px solid var(--border-dim);
       padding: 14px 16px;
       text-align: center;
     }
-
+ 
     .stat-value {
       font-family: 'Orbitron', monospace;
       font-size: 22px;
@@ -613,7 +643,7 @@
       color: var(--neon-cyan);
       text-shadow: 0 0 10px var(--neon-cyan);
     }
-
+ 
     .stat-label {
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
@@ -622,13 +652,13 @@
       text-transform: uppercase;
       margin-top: 4px;
     }
-
+ 
     /* USERS TABLE */
     .data-table {
       width: 100%;
       border-collapse: collapse;
     }
-
+ 
     .data-table th,
     .data-table td {
       padding: 10px 12px;
@@ -637,21 +667,21 @@
       font-family: 'Share Tech Mono', monospace;
       font-size: 11px;
     }
-
+ 
     .data-table th {
       color: var(--text-dim);
       letter-spacing: 2px;
       text-transform: uppercase;
     }
-
+ 
     .data-table td {
       color: var(--text-secondary);
     }
-
+ 
     .data-table tr:hover td {
       background: var(--bg-hover);
     }
-
+ 
     .online-dot {
       display: inline-block;
       width: 7px;
@@ -660,17 +690,17 @@
       margin-right: 6px;
       box-shadow: 0 0 6px currentColor;
     }
-
+ 
     .dot-green {
       background: var(--neon-green);
       color: var(--neon-green);
     }
-
+ 
     .dot-dim {
       background: var(--text-dim);
       color: var(--text-dim);
     }
-
+ 
     /* EDIT REQUEST */
     .edit-req {
       background: var(--bg-card);
@@ -681,35 +711,35 @@
       align-items: center;
       justify-content: space-between;
     }
-
+ 
     .edit-req-info {
       font-family: 'Share Tech Mono', monospace;
       font-size: 11px;
     }
-
+ 
     .edit-req-user {
       color: var(--neon-cyan);
       font-size: 12px;
     }
-
+ 
     .edit-req-snippet {
       color: var(--text-dim);
       font-size: 10px;
       margin-top: 2px;
     }
-
+ 
     .edit-btn-row {
       display: flex;
       gap: 8px;
     }
-
+ 
     .platform-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       margin-top: 8px;
     }
-
+ 
     .platform-badge {
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
@@ -718,17 +748,17 @@
       color: var(--text-dim);
       letter-spacing: 1px;
     }
-
+ 
     .divider {
       border: none;
       border-top: 1px solid var(--border-dim);
       margin: 20px 0;
     }
-
+ 
     .mono {
       font-family: 'Share Tech Mono', monospace;
     }
-
+ 
     .corner-tl {
       position: absolute;
       top: -1px;
@@ -738,7 +768,7 @@
       border-top: 2px solid var(--neon-cyan);
       border-left: 2px solid var(--neon-cyan);
     }
-
+ 
     .corner-br {
       position: absolute;
       bottom: -1px;
@@ -750,16 +780,16 @@
     }
   </style>
 </head>
-
+ 
 <body>
   <div class="scanlines"></div>
   <div class="grid-bg"></div>
-
+ 
   <div class="app" id="root"></div>
-
+ 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
+ 
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDG5_C6rCsaXi1sccuneUEgo4S7aIgTAUw",
@@ -770,7 +800,7 @@
       appId: "1:791883020342:web:a3bf8be2835ec1e6edc097",
       measurementId: "G-2Q9YP3DCBC"
     };
-
+ 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const LANGUAGES = ['javascript', 'python', 'c', 'cpp', 'java', 'rust', 'go', 'typescript', 'html', 'css', 'sql', 'bash', 'php', 'ruby', 'swift'];
@@ -779,34 +809,34 @@
       { value: '25min', label: '⚡ 25 Min Auto-Delete', badge: '25min', desc: 'Expires in 25 minutes' },
       { value: 'infinite', label: '∞ Infinite', badge: 'infinite', desc: 'Lives forever' }
     ];
-
+ 
     function genId() { return Math.random().toString(36).substr(2, 8).toUpperCase(); }
     function genUUID() { return [4, 4, 4, 4, 12].map(n => Math.random().toString(36).substr(2, n).toUpperCase()).join('-'); }
     function now() { return Date.now(); }
-
+ 
     const DB = {
       users: [],
       snippets: [],
       editRequests: []
     };
-
+ 
     // ─── Firebase save helpers ───────────────────────────────────────────────
     async function saveUserToFirebase(user) {
-      try { await db.collection("users").doc(user.id).set(user); } catch (e) { console.error("saveUser:", e); }
+      try { await db.collection("users").doc(user.id).set(user); } catch(e) { console.error("saveUser:", e); }
     }
-
+ 
     async function saveSnippetToFirebase(snippet) {
-      try { await db.collection("snippets").doc(snippet.id).set(snippet); } catch (e) { console.error("saveSnippet:", e); }
+      try { await db.collection("snippets").doc(snippet.id).set(snippet); } catch(e) { console.error("saveSnippet:", e); }
     }
-
+ 
     async function saveDB() {
       // sync entire DB to Firestore
       const batch = db.batch();
       DB.users.forEach(u => batch.set(db.collection("users").doc(u.id), u));
       DB.snippets.forEach(s => batch.set(db.collection("snippets").doc(s.id), s));
-      try { await batch.commit(); } catch (e) { console.error("saveDB batch:", e); }
+      try { await batch.commit(); } catch(e) { console.error("saveDB batch:", e); }
     }
-
+ 
     // ─── Load everything from Firebase on startup ────────────────────────────
     async function loadFromFirebase() {
       try {
@@ -822,7 +852,7 @@
           if (!Array.isArray(s.editRequests)) s.editRequests = [];
           DB.snippets.push(s);
         });
-      } catch (e) {
+      } catch(e) {
         console.error("loadFromFirebase:", e);
       }
     }
@@ -841,21 +871,21 @@
       viewedSnippet: null,
       editReqMsg: ''
     };
-
+ 
     function setState(patch) {
       Object.assign(STATE, patch);
       render();
     }
-
+ 
     function showAlert(type, msg) {
       setState({ alert: { type, msg } });
       setTimeout(() => setState({ alert: null }), 3500);
     }
-
+ 
     function getSnippetsByUser(uid) {
       return DB.snippets.filter(s => s.ownerId === uid);
     }
-
+ 
     async function handleLogin() {
       const { username, password } = STATE.loginForm;
       showAlert('info', '[SYNCING] Connecting to the grid...');
@@ -864,28 +894,28 @@
       if (!user) { showAlert('error', '[ACCESS DENIED] Invalid credentials'); return; }
       setState({ currentUser: user, view: 'app', activeTab: 'dashboard', alert: null });
     }
-
+ 
     async function handleRegister() {
       const { username, password, confirm } = STATE.registerForm;
-
+ 
       if (!username || !password) {
         showAlert('error', '[ERROR] Username and password required');
         return;
       }
-
+ 
       if (password !== confirm) {
         showAlert('error', '[ERROR] Passwords do not match');
         return;
       }
-
+ 
       // reload latest from firebase before checking duplicates
       await loadFromFirebase();
-
+ 
       if (DB.users.find(u => u.username === username)) {
         showAlert('error', '[ERROR] Username already exists');
         return;
       }
-
+ 
       const user = {
         id: 'USR-' + genId(),
         username,
@@ -893,10 +923,10 @@
         created: now(),
         role: 'user'
       };
-
+ 
       DB.users.push(user);
       await saveUserToFirebase(user);
-
+ 
       setState({
         currentUser: user,
         view: 'app',
@@ -904,7 +934,7 @@
         alert: null
       });
     }
-
+ 
     async function handleCreateSnippet() {
       const { projectName, description, language, expiryType, code } = STATE.newSnippet;
       if (!projectName || !code) { showAlert('error', '[ERROR] Project name and code required'); return; }
@@ -923,22 +953,41 @@
       setState({ shareResult: { id, url: shareUrl, expiryType }, newSnippet: { projectName: '', description: '', language: 'python', expiryType: 'infinite', code: '' } });
       showAlert('success', '[SUCCESS] Snippet encrypted and uploaded to the grid');
     }
-
+ 
     async function handleViewSnippet() {
-      const id = STATE.viewSnippetId.trim().toUpperCase();
+      // Accept full share URL or bare snippet ID
+      let raw = STATE.viewSnippetId.trim();
+      try {
+        const u = new URL(raw);
+        const p = u.searchParams.get('snippet');
+        if (p) raw = p;
+      } catch(e) {}
+      const id = raw.toUpperCase();
+ 
+      // Always fetch latest from Firebase so other users' snippets are found
+      showAlert('info', '[SYNCING] Fetching from the grid...');
+      await loadFromFirebase();
+ 
       const snippet = DB.snippets.find(s => s.id === id);
       if (!snippet) { showAlert('error', '[404] Snippet not found on the grid'); setState({ viewedSnippet: null }); return; }
-      if (snippet.expiryType === '25min' && snippet.expiresAt && now() > snippet.expiresAt) {
-        showAlert('error', '[EXPIRED] This snippet has been purged from memory'); setState({ viewedSnippet: null }); return;
+ 
+      const isOwner = snippet.ownerId === STATE.currentUser.id;
+ 
+      // Owner bypasses ALL expiry — always sees their own code
+      if (!isOwner) {
+        if (snippet.expiryType === '25min' && snippet.expiresAt && now() > snippet.expiresAt) {
+          showAlert('error', '[EXPIRED] This snippet has been purged from memory'); setState({ viewedSnippet: null }); return;
+        }
+        if (snippet.expiryType === 'one-time' && snippet.accessed > 0) {
+          showAlert('error', '[DESTROYED] One-time snippet already accessed. Data wiped.'); setState({ viewedSnippet: null }); return;
+        }
+        snippet.accessed++;
+        await saveSnippetToFirebase(snippet);
       }
-      if (snippet.expiryType === 'one-time' && snippet.accessed > 0 && snippet.ownerId !== STATE.currentUser.id) {
-        showAlert('error', '[DESTROYED] One-time snippet already accessed. Data wiped.'); setState({ viewedSnippet: null }); return;
-      }
-      if (snippet.ownerId !== STATE.currentUser.id) snippet.accessed++;
-      await saveSnippetToFirebase(snippet);
-      setState({ viewedSnippet: snippet });
+ 
+      setState({ viewedSnippet: snippet, alert: null });
     }
-
+ 
     async function handleEditRequest(snippetId) {
       const snippet = DB.snippets.find(s => s.id === snippetId);
       if (!snippet) return;
@@ -953,7 +1002,7 @@
       showAlert('success', '[SENT] Edit permission request transmitted');
       setState({ modal: null, editReqMsg: '' });
     }
-
+ 
     async function handleApproveEdit(snippetId, reqIdx) {
       const snippet = DB.snippets.find(s => s.id === snippetId);
       if (snippet) snippet.editRequests.splice(reqIdx, 1);
@@ -961,12 +1010,12 @@
       showAlert('success', '[GRANTED] Edit access approved');
       render();
     }
-
+ 
     function copyToClipboard(text) {
       navigator.clipboard?.writeText(text).catch(() => { });
       showAlert('success', '[COPIED] Data copied to buffer');
     }
-
+ 
     function formatTime(ts) {
       const d = now() - ts;
       if (d < 60000) return 'just now';
@@ -974,19 +1023,19 @@
       if (d < 86400000) return Math.floor(d / 3600000) + 'h ago';
       return Math.floor(d / 86400000) + 'd ago';
     }
-
+ 
     function getBadgeClass(expiryType) {
       return 'badge badge-' + (expiryType === 'one-time' ? 'onetime' : expiryType);
     }
     function getExpiryLabel(et) {
       return et === 'one-time' ? '🔥 ONE-TIME' : et === '25min' ? '⚡ 25MIN' : '∞ INFINITE';
     }
-
+ 
     function renderAlert() {
       if (!STATE.alert) return '';
       return `<div class="alert alert-${STATE.alert.type}" style="margin-bottom:16px">${STATE.alert.msg}</div>`;
     }
-
+ 
     function renderAuth() {
       return `
   <div class="auth-screen">
@@ -1031,7 +1080,7 @@
     </div>
   </div>`;
     }
-
+ 
     function renderDashboard() {
       const mySnippets = getSnippetsByUser(STATE.currentUser.id);
       const myPending = DB.snippets.filter(s => s.ownerId === STATE.currentUser.id && s.editRequests.length > 0);
@@ -1081,7 +1130,7 @@
     </div>
   `;
     }
-
+ 
     function renderCreate() {
       return `
     <div class="panel">
@@ -1129,7 +1178,7 @@
         </div>
         <div class="field">
           <label>// Code Payload</label>
-          <textarea placeholder="// paste your code here..." oninput="STATE.newSnippet.code=this.value" style="min-height:200px;color:var(--neon-green);font-size:13px">${STATE.newSnippet.code}</textarea>
+          <textarea placeholder="// paste your code here..." oninput="STATE.newSnippet.code=this.value" style="min-height:200px;color:var(--text-primary);font-size:13px">${STATE.newSnippet.code}</textarea>
         </div>
         ${STATE.newSnippet.expiryType === 'one-time' ? `<div class="alert alert-info">// WARNING: This snippet will be permanently destroyed after the first access.</div>` : ''}
         ${STATE.newSnippet.expiryType === '25min' ? `<div class="alert" style="border-color:var(--neon-amber);color:var(--neon-amber);background:rgba(255,183,0,0.05)">// WARNING: This snippet will auto-purge from the grid in 25 minutes.</div>` : ''}
@@ -1138,7 +1187,7 @@
     </div>
   `;
     }
-
+ 
     function renderViewer() {
       return `
     <div class="panel">
@@ -1166,9 +1215,13 @@
               ${s.ownerId !== STATE.currentUser.id ? `<button class="btn btn-amber btn-sm" onclick="setState({modal:{type:'editreq',snippet:s}})">REQUEST EDIT</button>` : ''}
             </div>
           </div>
-          <div class="code-display" oncontextmenu="return false">${escapeHtml(s.code)}</div>
+          <div class="code-display protected" oncontextmenu="return false" style="position:relative">
+            <div class="code-shield"></div>
+            ${escapeHtml(s.code)}
+          </div>
           <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-            ${s.ownerId === STATE.currentUser.id ? `<button class="btn btn-cyan btn-sm" onclick="copyToClipboard(DB.snippets.find(x=>x.id==='${s.id}').code||'')">COPY CODE</button>` : ''}
+            <button class="btn btn-green btn-sm" onclick="(()=>{const sn=DB.snippets.find(x=>x.id==='${s.id}');if(sn&&navigator.clipboard)navigator.clipboard.writeText(sn.code);showAlert('success','[COPIED] Code copied to buffer')})()">COPY CODE</button>
+            <button class="btn btn-cyan btn-sm" onclick="copyToClipboard(window.location.href.split('?')[0]+'?snippet=${s.id}')">COPY SHARE LINK</button>
             <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);align-self:center">ACCESSED: ${s.accessed} times · ID: ${s.id.split('-')[0]}</span>
           </div>
         `;
@@ -1176,7 +1229,7 @@
     </div>
   `;
     }
-
+ 
     function renderUsers() {
       if (STATE.currentUser.role !== 'admin') return `<div class="alert alert-error">// ACCESS DENIED: Admin clearance required</div>`;
       const totalSnippets = DB.snippets.length;
@@ -1230,7 +1283,7 @@
     </div>
   `;
     }
-
+ 
     function renderModal() {
       if (!STATE.modal) return '';
       const m = STATE.modal;
@@ -1250,9 +1303,10 @@
             <div><label style="font-family:'Share Tech Mono';font-size:9px;color:var(--text-dim);letter-spacing:2px">EXPIRY</label><div><span class="${getBadgeClass(s.expiryType)}">${getExpiryLabel(s.expiryType)}</span></div></div>
             <div><label style="font-family:'Share Tech Mono';font-size:9px;color:var(--text-dim);letter-spacing:2px">ACCESSES</label><div style="font-family:'Share Tech Mono';font-size:12px;color:var(--text-primary)">${s.accessed}</div></div>
           </div>
-          <div class="code-display" oncontextmenu="return false" style="max-height:200px;overflow-y:auto">${escapeHtml(s.code)}</div>
+          <div class="code-display protected" oncontextmenu="return false" style="max-height:200px;overflow-y:auto;position:relative"><div class="code-shield"></div>${escapeHtml(s.code)}</div>
           <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn btn-cyan btn-sm" onclick="copyToClipboard(window.location.origin + '/s/${s.id}')">COPY SHARE URL</button>
+            <button class="btn btn-green btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText('${s.code.replace(/'/g,"\\'")}');showAlert('success','[COPIED] Code copied to buffer')">COPY CODE</button>
+            <button class="btn btn-cyan btn-sm" onclick="copyToClipboard(window.location.href.split('?')[0]+'?snippet=${s.id}')">COPY SHARE URL</button>
             <button class="btn btn-cyan btn-sm" onclick="copyToClipboard('${s.id}')">COPY ID</button>
             ${s.editRequests.length > 0 ? `<span style="font-family:'Share Tech Mono';font-size:10px;color:var(--neon-pink);align-self:center">${s.editRequests.length} edit request(s) pending</span>` : ''}
           </div>
@@ -1300,11 +1354,11 @@
       }
       return '';
     }
-
+ 
     function escapeHtml(str) {
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
-
+ 
     function renderApp() {
       const tabs = [
         { id: 'dashboard', label: 'DASHBOARD' },
@@ -1317,7 +1371,7 @@
       else if (STATE.activeTab === 'create') content = renderCreate();
       else if (STATE.activeTab === 'viewer') content = renderViewer();
       else if (STATE.activeTab === 'users') content = renderUsers();
-
+ 
       return `
     ${renderModal()}
     <div class="header">
@@ -1338,33 +1392,33 @@
     ${content}
   `;
     }
-
+ 
     function render() {
       const root = document.getElementById('root');
       root.innerHTML = STATE.view === 'auth' ? renderAuth() : renderApp();
     }
-
+ 
     document.addEventListener('contextmenu', e => {
       const el = e.target.closest('.code-display');
       if (el) e.preventDefault();
     });
-
+ 
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && ['p', 's'].includes(e.key.toLowerCase())) {
         const el = document.querySelector('.code-display');
         if (el) e.preventDefault();
       }
     });
-
+ 
     // ─── Public share link handler ──────────────────────────────────────────
     async function handleShareLink() {
       const params = new URLSearchParams(window.location.search);
       const snippetId = params.get('snippet');
       if (!snippetId) return false;
-
+ 
       // Load from Firebase first
       await loadFromFirebase();
-
+ 
       const snippet = DB.snippets.find(s => s.id === snippetId.toUpperCase());
       if (!snippet) {
         // Show public error page
@@ -1378,18 +1432,19 @@
           </div>`;
         return true;
       }
-
+ 
       // Check code-level expiry (but link itself stays valid)
+      // Note: expiry only applies to non-owners — owner always sees their code
       const expired = snippet.expiryType === '25min' && snippet.expiresAt && now() > snippet.expiresAt;
       const destroyed = snippet.expiryType === 'one-time' && snippet.accessed > 0;
       const ownerUser = DB.users.find(u => u.id === snippet.ownerId);
-
+ 
       // Increment access counter if not expired/destroyed
       if (!expired && !destroyed) {
         snippet.accessed++;
         await saveSnippetToFirebase(snippet);
       }
-
+ 
       // Render public snippet page (no login needed)
       document.getElementById('root').innerHTML = `
         <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
@@ -1406,8 +1461,8 @@
                 <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a6a7a">shared by ${ownerUser ? ownerUser.username : 'unknown'} · ${snippet.accessed} views</span>
               </div>
               ${expired ? `<div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#ffb700;padding:16px;border:1px solid rgba(255,183,0,0.3);background:rgba(255,183,0,0.05)">⚡ CODE EXPIRED — This snippet's 25-minute window has closed. The share link remains valid but the code has been purged.</div>`
-          : destroyed ? `<div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#ff073a;padding:16px;border:1px solid rgba(255,7,58,0.3);background:rgba(255,7,58,0.05)">🔥 CODE DESTROYED — This was a one-time snippet. It has already been accessed. Share link is permanent but code is gone.</div>`
-            : `<div style="background:#020408;border:1px solid rgba(0,245,255,0.12);padding:16px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.6;color:#39ff14;text-shadow:0 0 4px rgba(57,255,20,0.3);overflow-x:auto;white-space:pre-wrap;user-select:none;-webkit-user-select:none">${snippet.code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`}
+              : destroyed ? `<div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#ff073a;padding:16px;border:1px solid rgba(255,7,58,0.3);background:rgba(255,7,58,0.05)">🔥 CODE DESTROYED — This was a one-time snippet. It has already been accessed. Share link is permanent but code is gone.</div>`
+              : `<div id="public-code" style="position:relative;background:#020408;border:1px solid rgba(0,245,255,0.12);padding:16px;font-family:'Share Tech Mono',monospace;font-size:13px;line-height:1.7;color:#e8f4f8;overflow-x:auto;white-space:pre-wrap;user-select:none;-webkit-user-select:none;-moz-user-select:none"><div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-45deg,rgba(0,245,255,0.015) 0px,rgba(0,245,255,0.015) 1px,transparent 1px,transparent 8px);z-index:2"></div>${snippet.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`}
             </div>
             <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a6a7a;text-align:center;letter-spacing:1px">
               SHARE LINK IS PERMANENT · CODE EXPIRY: ${snippet.expiryType === 'one-time' ? '🔥 ONE-TIME' : snippet.expiryType === '25min' ? '⚡ 25MIN' : '∞ INFINITE'}
@@ -1416,7 +1471,52 @@
         </div>`;
       return true;
     }
-
+ 
+    // ─── Anti-screenshot: blur code when tab/window loses focus ────────────────
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        document.body.classList.add('unfocused');
+      } else {
+        document.body.classList.remove('unfocused');
+      }
+    });
+    window.addEventListener('blur', () => document.body.classList.add('unfocused'));
+    window.addEventListener('focus', () => document.body.classList.remove('unfocused'));
+ 
+    // Block PrintScreen key (Windows)
+    document.addEventListener('keyup', e => {
+      if (e.key === 'PrintScreen') {
+        navigator.clipboard && navigator.clipboard.writeText('');
+        document.querySelectorAll('.code-display').forEach(el => {
+          el.style.filter = 'blur(10px)';
+          setTimeout(() => el.style.filter = '', 600);
+        });
+      }
+    });
+    // Block common screenshot shortcuts
+    document.addEventListener('keydown', e => {
+      const ss = (e.key === 'PrintScreen') ||
+        (e.metaKey && e.shiftKey && ['3','4','5'].includes(e.key)) || // Mac
+        (e.ctrlKey && e.shiftKey && e.key === 'S');
+      if (ss) {
+        e.preventDefault();
+        document.querySelectorAll('.code-display').forEach(el => {
+          el.style.filter = 'blur(10px)';
+          setTimeout(() => el.style.filter = '', 800);
+        });
+      }
+    });
+ 
+    // Also blur public-code div on focus loss
+    window.addEventListener('blur', () => {
+      const pc = document.getElementById('public-code');
+      if (pc) pc.style.filter = 'blur(8px)';
+    });
+    window.addEventListener('focus', () => {
+      const pc = document.getElementById('public-code');
+      if (pc) pc.style.filter = '';
+    });
+ 
     // Initial load — fetch all data from Firestore before first render
     (async () => {
       const handled = await handleShareLink();
@@ -1427,5 +1527,5 @@
     })();
   </script>
 </body>
-
+ 
 </html>
