@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html>
-
+ 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+ 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
     :root {
       --neon-cyan: #00f5ff;
       --neon-green: #39ff14;
@@ -30,778 +26,170 @@
       --text-secondary: #8ab4c8;
       --text-dim: #4a6a7a;
     }
-
-    body {
-      font-family: 'Rajdhani', sans-serif;
-      background: var(--bg-void);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .scanlines {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.08) 2px, rgba(0, 0, 0, 0.08) 4px);
-      pointer-events: none;
-      z-index: 1000;
-    }
-
-    /* Screenshot / screen-record blocker overlay */
-    @media print {
-      .code-display {
-        visibility: hidden !important;
-      }
-
-      .code-display::after {
-        content: '[CODE PROTECTED]';
-        visibility: visible;
-        color: #ff073a;
-      }
-    }
-
-    .code-shield {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      background: repeating-linear-gradient(-45deg,
-          rgba(0, 245, 255, 0.015) 0px,
-          rgba(0, 245, 255, 0.015) 1px,
-          transparent 1px,
-          transparent 8px);
-    }
-
-    .grid-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
-      background-size: 50px 50px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .app {
-      position: relative;
-      z-index: 1;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 16px 40px;
-    }
-
-    /* HEADER */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 0 16px;
-      border-bottom: 1px solid var(--border-dim);
-      margin-bottom: 24px;
-    }
-
-    .logo {
-      font-family: 'Orbitron', monospace;
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px rgba(0, 245, 255, 0.3);
-      letter-spacing: 4px;
-    }
-
-    .logo span {
-      color: var(--neon-pink);
-      text-shadow: 0 0 20px var(--neon-pink);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-badge {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: var(--neon-green);
-      background: rgba(57, 255, 20, 0.08);
-      border: 1px solid rgba(57, 255, 20, 0.3);
-      padding: 4px 12px;
-      border-radius: 2px;
-      text-shadow: 0 0 8px var(--neon-green);
-    }
-
-    /* BUTTONS */
-    .btn {
-      font-family: 'Orbitron', monospace;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 10px 20px;
-      border: 1px solid;
-      cursor: pointer;
-      transition: all 0.2s;
-      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-      background: transparent;
-    }
-
-    .btn-cyan {
-      border-color: var(--neon-cyan);
-      color: var(--neon-cyan);
-      text-shadow: 0 0 8px var(--neon-cyan);
-    }
-
-    .btn-cyan:hover {
-      background: rgba(0, 245, 255, 0.1);
-      box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
-    }
-
-    .btn-green {
-      border-color: var(--neon-green);
-      color: var(--neon-green);
-      text-shadow: 0 0 8px var(--neon-green);
-    }
-
-    .btn-green:hover {
-      background: rgba(57, 255, 20, 0.1);
-      box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
-    }
-
-    .btn-pink {
-      border-color: var(--neon-pink);
-      color: var(--neon-pink);
-      text-shadow: 0 0 8px var(--neon-pink);
-    }
-
-    .btn-pink:hover {
-      background: rgba(255, 7, 58, 0.1);
-      box-shadow: 0 0 20px rgba(255, 7, 58, 0.3);
-    }
-
-    .btn-amber {
-      border-color: var(--neon-amber);
-      color: var(--neon-amber);
-      text-shadow: 0 0 8px var(--neon-amber);
-    }
-
-    .btn-amber:hover {
-      background: rgba(255, 183, 0, 0.1);
-    }
-
-    .btn-sm {
-      padding: 6px 14px;
-      font-size: 9px;
-    }
-
-    .btn-full {
-      width: 100%;
-      display: block;
-      text-align: center;
-    }
-
-    /* NAV TABS */
-    .nav-tabs {
-      display: flex;
-      gap: 2px;
-      margin-bottom: 24px;
-      border-bottom: 1px solid var(--border-dim);
-    }
-
-    .nav-tab {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      padding: 10px 18px;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--text-dim);
-      transition: all 0.2s;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-    }
-
-    .nav-tab:hover {
-      color: var(--text-secondary);
-    }
-
-    .nav-tab.active {
-      color: var(--neon-cyan);
-      border-bottom-color: var(--neon-cyan);
-      text-shadow: 0 0 8px var(--neon-cyan);
-    }
-
-    /* PANELS */
-    .panel {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-dim);
-      padding: 24px;
-      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .panel::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 0 16px 16px 0;
-      border-color: transparent var(--neon-cyan) transparent transparent;
-      opacity: 0.4;
-    }
-
-    .panel-title {
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      color: var(--neon-cyan);
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .panel-title::before {
-      content: '';
-      display: block;
-      width: 3px;
-      height: 14px;
-      background: var(--neon-cyan);
-      box-shadow: 0 0 8px var(--neon-cyan);
-    }
-
-    /* INPUTS */
-    .field {
-      margin-bottom: 16px;
-    }
-
-    .field label {
-      display: block;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: var(--text-dim);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    .field input,
-    .field select,
-    .field textarea {
-      width: 100%;
-      background: var(--bg-deep);
-      border: 1px solid var(--border-dim);
-      color: var(--text-primary);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      padding: 10px 14px;
-      outline: none;
-      transition: all 0.2s;
-      -webkit-appearance: none;
-    }
-
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus {
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 12px rgba(0, 245, 255, 0.15);
-    }
-
-    .field textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    .field select {
-      cursor: pointer;
-    }
-
-    .field select option {
-      background: var(--bg-deep);
-    }
-
-    .field input[type="password"] {
-      letter-spacing: 4px;
-    }
-
-    /* TWO-COL */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* AUTH SCREEN */
-    .auth-screen {
-      min-height: 90vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .auth-box {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-dim);
-      padding: 40px;
-      width: 100%;
-      max-width: 440px;
-      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
-      position: relative;
-    }
-
-    .auth-logo {
-      font-family: 'Orbitron', monospace;
-      font-size: 28px;
-      font-weight: 900;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 30px var(--neon-cyan), 0 0 60px rgba(0, 245, 255, 0.2);
-      text-align: center;
-      margin-bottom: 4px;
-      letter-spacing: 6px;
-    }
-
-    .auth-logo span {
-      color: var(--neon-pink);
-      text-shadow: 0 0 30px var(--neon-pink);
-    }
-
-    .auth-sub {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: var(--text-dim);
-      text-align: center;
-      letter-spacing: 4px;
-      margin-bottom: 32px;
-    }
-
-    .auth-tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 28px;
-      border: 1px solid var(--border-dim);
-    }
-
-    .auth-tab {
-      flex: 1;
-      padding: 10px;
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--text-dim);
-      transition: all 0.2s;
-    }
-
-    .auth-tab.active {
-      background: rgba(0, 245, 255, 0.1);
-      color: var(--neon-cyan);
-      text-shadow: 0 0 8px var(--neon-cyan);
-    }
-
-    /* SNIPPET CARDS */
-    .snippet-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      padding: 16px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-
-    .snippet-card:hover {
-      border-color: rgba(0, 245, 255, 0.4);
-      background: var(--bg-hover);
-    }
-
-    .snippet-card-active {
-      border-color: var(--neon-cyan) !important;
-      background: var(--bg-hover) !important;
-      box-shadow: 0 0 12px rgba(0, 245, 255, 0.15);
-    }
-
-    .snippet-card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .snippet-project {
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: var(--neon-cyan);
-    }
-
-    .snippet-desc {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 10px;
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .snippet-meta {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1px;
-      padding: 3px 8px;
-      border: 1px solid;
-      text-transform: uppercase;
-    }
-
-    .badge-lang {
-      border-color: rgba(191, 90, 242, 0.4);
-      color: var(--neon-purple);
-      background: rgba(191, 90, 242, 0.08);
-    }
-
-    .badge-onetime {
-      border-color: rgba(255, 7, 58, 0.4);
-      color: var(--neon-pink);
-      background: rgba(255, 7, 58, 0.08);
-    }
-
-    .badge-25min {
-      border-color: rgba(255, 183, 0, 0.4);
-      color: var(--neon-amber);
-      background: rgba(255, 183, 0, 0.08);
-    }
-
-    .badge-infinite {
-      border-color: rgba(57, 255, 20, 0.4);
-      color: var(--neon-green);
-      background: rgba(57, 255, 20, 0.08);
-    }
-
-    .badge-id {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      color: var(--text-dim);
-      letter-spacing: 1px;
-    }
-
-    /* CODE VIEW */
-    .code-display {
-      background: var(--bg-void);
-      border: 1px solid var(--border-dim);
-      padding: 16px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      line-height: 1.7;
-      color: #e8f4f8;
-      text-shadow: none;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      position: relative;
-      margin-top: 12px;
-    }
-
-    /* Anti-screenshot: blur code when window loses focus */
-    .code-display.protected {
-      filter: none;
-      transition: filter 0.15s;
-    }
-
-    body.unfocused .code-display.protected {
-      filter: blur(8px);
-    }
-
-    /* SHARE LINK BOX */
-    .share-link-box {
-      background: rgba(0, 245, 255, 0.05);
-      border: 1px solid rgba(0, 245, 255, 0.3);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .share-link-url {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: var(--neon-cyan);
-      word-break: break-all;
-    }
-
-    /* ALERT */
-    .alert {
-      padding: 12px 16px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      margin-bottom: 16px;
-      border-left: 3px solid;
-    }
-
-    .alert-success {
-      border-color: var(--neon-green);
-      color: var(--neon-green);
-      background: rgba(57, 255, 20, 0.05);
-    }
-
-    .alert-error {
-      border-color: var(--neon-pink);
-      color: var(--neon-pink);
-      background: rgba(255, 7, 58, 0.05);
-    }
-
-    .alert-info {
-      border-color: var(--neon-cyan);
-      color: var(--neon-cyan);
-      background: rgba(0, 245, 255, 0.05);
-    }
-
-    /* MODAL */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(2, 4, 8, 0.92);
-      z-index: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal {
-      background: var(--bg-panel);
-      border: 1px solid var(--neon-cyan);
-      box-shadow: 0 0 40px rgba(0, 245, 255, 0.2);
-      padding: 28px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-      position: relative;
-    }
-
-    .modal-title {
-      font-family: 'Orbitron', monospace;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      color: var(--neon-cyan);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .modal-close {
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: var(--neon-pink);
-      font-size: 18px;
-    }
-
-    /* STAT ROW */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      padding: 14px 16px;
-      text-align: center;
-    }
-
-    .stat-value {
-      font-family: 'Orbitron', monospace;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 10px var(--neon-cyan);
-    }
-
-    .stat-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      color: var(--text-dim);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-
-    /* USERS TABLE */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .data-table th,
-    .data-table td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-dim);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-    }
-
-    .data-table th {
-      color: var(--text-dim);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .data-table td {
-      color: var(--text-secondary);
-    }
-
-    .data-table tr:hover td {
-      background: var(--bg-hover);
-    }
-
-    .online-dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      margin-right: 6px;
-      box-shadow: 0 0 6px currentColor;
-    }
-
-    .dot-green {
-      background: var(--neon-green);
-      color: var(--neon-green);
-    }
-
-    .dot-dim {
-      background: var(--text-dim);
-      color: var(--text-dim);
-    }
-
-    /* EDIT REQUEST */
-    .edit-req {
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .edit-req-info {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-    }
-
-    .edit-req-user {
-      color: var(--neon-cyan);
-      font-size: 12px;
-    }
-
-    .edit-req-snippet {
-      color: var(--text-dim);
-      font-size: 10px;
-      margin-top: 2px;
-    }
-
-    .edit-btn-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .platform-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-
-    .platform-badge {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      padding: 3px 10px;
-      border: 1px solid rgba(0, 245, 255, 0.2);
-      color: var(--text-dim);
-      letter-spacing: 1px;
-    }
-
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border-dim);
-      margin: 20px 0;
-    }
-
-    .mono {
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .corner-tl {
-      position: absolute;
-      top: -1px;
-      left: -1px;
-      width: 12px;
-      height: 12px;
-      border-top: 2px solid var(--neon-cyan);
-      border-left: 2px solid var(--neon-cyan);
-    }
-
-    .corner-br {
-      position: absolute;
-      bottom: -1px;
-      right: -1px;
-      width: 12px;
-      height: 12px;
-      border-bottom: 2px solid var(--neon-cyan);
-      border-right: 2px solid var(--neon-cyan);
-    }
+ 
+    body { font-family: 'Rajdhani', sans-serif; background: var(--bg-void); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+ 
+    .scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px); pointer-events: none; z-index: 1000; }
+ 
+    @media print { .code-display { visibility: hidden !important; } .code-display::after { content: '[CODE PROTECTED]'; visibility: visible; color: #ff073a; } }
+ 
+    .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
+ 
+    .app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
+ 
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0 16px; border-bottom: 1px solid var(--border-dim); margin-bottom: 24px; }
+ 
+    .logo { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; color: var(--neon-cyan); text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px rgba(0,245,255,0.3); letter-spacing: 4px; }
+    .logo span { color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink); }
+ 
+    .header-right { display: flex; align-items: center; gap: 12px; }
+ 
+    .user-badge { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--neon-green); background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.3); padding: 4px 12px; border-radius: 2px; text-shadow: 0 0 8px var(--neon-green); }
+ 
+    .btn { font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; border: 1px solid; cursor: pointer; transition: all 0.2s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); background: transparent; }
+    .btn-cyan { border-color: var(--neon-cyan); color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+    .btn-cyan:hover { background: rgba(0,245,255,0.1); box-shadow: 0 0 20px rgba(0,245,255,0.3); }
+    .btn-green { border-color: var(--neon-green); color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
+    .btn-green:hover { background: rgba(57,255,20,0.1); box-shadow: 0 0 20px rgba(57,255,20,0.3); }
+    .btn-pink { border-color: var(--neon-pink); color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
+    .btn-pink:hover { background: rgba(255,7,58,0.1); box-shadow: 0 0 20px rgba(255,7,58,0.3); }
+    .btn-amber { border-color: var(--neon-amber); color: var(--neon-amber); text-shadow: 0 0 8px var(--neon-amber); }
+    .btn-amber:hover { background: rgba(255,183,0,0.1); }
+    .btn-purple { border-color: var(--neon-purple); color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple); }
+    .btn-purple:hover { background: rgba(191,90,242,0.1); }
+    .btn-sm { padding: 6px 14px; font-size: 9px; }
+    .btn-full { width: 100%; display: block; text-align: center; }
+ 
+    .nav-tabs { display: flex; gap: 2px; margin-bottom: 24px; border-bottom: 1px solid var(--border-dim); }
+    .nav-tab { font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700; letter-spacing: 2px; padding: 10px 18px; cursor: pointer; border: none; background: transparent; color: var(--text-dim); transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .nav-tab:hover { color: var(--text-secondary); }
+    .nav-tab.active { color: var(--neon-cyan); border-bottom-color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+ 
+    .panel { background: var(--bg-panel); border: 1px solid var(--border-dim); padding: 24px; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); margin-bottom: 20px; position: relative; }
+    .panel::before { content: ''; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 16px 16px 0; border-color: transparent var(--neon-cyan) transparent transparent; opacity: 0.4; }
+ 
+    .panel-title { font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .panel-title::before { content: ''; display: block; width: 3px; height: 14px; background: var(--neon-cyan); box-shadow: 0 0 8px var(--neon-cyan); }
+ 
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+    .field input, .field select, .field textarea { width: 100%; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-primary); font-family: 'Share Tech Mono', monospace; font-size: 13px; padding: 10px 14px; outline: none; transition: all 0.2s; -webkit-appearance: none; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0,245,255,0.15); }
+    .field textarea { resize: vertical; min-height: 120px; }
+    .field select { cursor: pointer; }
+    .field select option { background: var(--bg-deep); }
+    .field input[type="password"] { letter-spacing: 4px; }
+ 
+    /* Topic tree sidebar */
+    .topic-tree { background: var(--bg-card); border: 1px solid var(--border-dim); padding: 0; overflow: hidden; }
+    .topic-tree-header { font-family: 'Orbitron', monospace; font-size: 9px; letter-spacing: 3px; color: var(--neon-cyan); padding: 12px 16px; border-bottom: 1px solid var(--border-dim); display: flex; align-items: center; justify-content: space-between; }
+    .topic-item { border-bottom: 1px solid rgba(0,245,255,0.06); }
+    .topic-name { font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 10px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; color: var(--text-secondary); }
+    .topic-name:hover { background: var(--bg-hover); color: var(--neon-cyan); }
+    .topic-name.active-topic { color: var(--neon-cyan); background: rgba(0,245,255,0.06); }
+    .topic-arrow { font-size: 10px; transition: transform 0.2s; display: inline-block; }
+    .topic-arrow.open { transform: rotate(90deg); }
+    .subtopic-list { display: none; background: rgba(0,0,0,0.2); }
+    .subtopic-list.open { display: block; }
+    .subtopic-item { font-family: 'Share Tech Mono', monospace; font-size: 11px; padding: 8px 16px 8px 30px; cursor: pointer; color: var(--text-dim); border-left: 2px solid transparent; transition: all 0.15s; display: flex; align-items: center; justify-content: space-between; }
+    .subtopic-item:hover { color: var(--neon-cyan); background: rgba(0,245,255,0.04); border-left-color: rgba(0,245,255,0.3); }
+    .subtopic-item.active { color: var(--neon-cyan); border-left-color: var(--neon-cyan); background: rgba(0,245,255,0.07); text-shadow: 0 0 6px rgba(0,245,255,0.5); }
+    .subtopic-count { font-size: 9px; color: var(--text-dim); background: rgba(0,245,255,0.08); border: 1px solid rgba(0,245,255,0.15); padding: 1px 6px; border-radius: 2px; }
+ 
+    /* Add topic/subtopic buttons */
+    .add-topic-row { padding: 10px 16px; border-top: 1px solid var(--border-dim); display: flex; gap: 8px; }
+ 
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+ 
+    /* Vault layout: topic tree + snippet list + detail */
+    .vault-layout { display: grid; grid-template-columns: 220px 280px 1fr; gap: 14px; align-items: start; }
+    .vault-layout-2 { display: grid; grid-template-columns: 220px 1fr; gap: 14px; align-items: start; }
+ 
+    .auth-screen { min-height: 90vh; display: flex; align-items: center; justify-content: center; }
+    .auth-box { background: var(--bg-panel); border: 1px solid var(--border-dim); padding: 40px; width: 100%; max-width: 440px; clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)); position: relative; }
+    .auth-logo { font-family: 'Orbitron', monospace; font-size: 28px; font-weight: 900; color: var(--neon-cyan); text-shadow: 0 0 30px var(--neon-cyan), 0 0 60px rgba(0,245,255,0.2); text-align: center; margin-bottom: 4px; letter-spacing: 6px; }
+    .auth-logo span { color: var(--neon-pink); text-shadow: 0 0 30px var(--neon-pink); }
+    .auth-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); text-align: center; letter-spacing: 4px; margin-bottom: 32px; }
+    .auth-tabs { display: flex; gap: 0; margin-bottom: 28px; border: 1px solid var(--border-dim); }
+    .auth-tab { flex: 1; padding: 10px; font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700; letter-spacing: 2px; cursor: pointer; border: none; background: transparent; color: var(--text-dim); transition: all 0.2s; }
+    .auth-tab.active { background: rgba(0,245,255,0.1); color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+ 
+    .snippet-card { background: var(--bg-card); border: 1px solid var(--border-dim); padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; position: relative; }
+    .snippet-card:hover { border-color: rgba(0,245,255,0.4); background: var(--bg-hover); }
+    .snippet-card-active { border-color: var(--neon-cyan) !important; background: var(--bg-hover) !important; box-shadow: 0 0 12px rgba(0,245,255,0.15); }
+    .snippet-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+    .snippet-project { font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--neon-cyan); }
+    .snippet-desc { font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; font-family: 'Share Tech Mono', monospace; }
+    .snippet-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+ 
+    .badge { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 2px 7px; border: 1px solid; text-transform: uppercase; }
+    .badge-lang { border-color: rgba(191,90,242,0.4); color: var(--neon-purple); background: rgba(191,90,242,0.08); }
+    .badge-onetime { border-color: rgba(255,7,58,0.4); color: var(--neon-pink); background: rgba(255,7,58,0.08); }
+    .badge-25min { border-color: rgba(255,183,0,0.4); color: var(--neon-amber); background: rgba(255,183,0,0.08); }
+    .badge-infinite { border-color: rgba(57,255,20,0.4); color: var(--neon-green); background: rgba(57,255,20,0.08); }
+    .badge-topic { border-color: rgba(0,245,255,0.3); color: var(--neon-cyan); background: rgba(0,245,255,0.06); }
+    .badge-id { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 1px; }
+ 
+    .code-display { background: var(--bg-void); border: 1px solid var(--border-dim); padding: 16px; font-family: 'Share Tech Mono', monospace; font-size: 13px; line-height: 1.7; color: #e8f4f8; overflow-x: auto; white-space: pre-wrap; user-select: none; -webkit-user-select: none; position: relative; margin-top: 12px; }
+    body.unfocused .code-display { filter: blur(8px); }
+ 
+    .share-link-box { background: rgba(0,245,255,0.05); border: 1px solid rgba(0,245,255,0.3); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+    .share-link-url { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--neon-cyan); word-break: break-all; }
+ 
+    .alert { padding: 12px 16px; font-family: 'Share Tech Mono', monospace; font-size: 11px; margin-bottom: 16px; border-left: 3px solid; }
+    .alert-success { border-color: var(--neon-green); color: var(--neon-green); background: rgba(57,255,20,0.05); }
+    .alert-error { border-color: var(--neon-pink); color: var(--neon-pink); background: rgba(255,7,58,0.05); }
+    .alert-info { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,245,255,0.05); }
+ 
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border-dim); padding: 14px 16px; text-align: center; }
+    .stat-value { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 700; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
+    .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+ 
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th, .data-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-dim); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+    .data-table th { color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+    .data-table td { color: var(--text-secondary); }
+    .data-table tr:hover td { background: var(--bg-hover); }
+ 
+    .online-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 6px currentColor; }
+    .dot-green { background: var(--neon-green); color: var(--neon-green); }
+    .dot-dim { background: var(--text-dim); color: var(--text-dim); }
+ 
+    .edit-req { background: var(--bg-card); border: 1px solid var(--border-dim); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .edit-req-info { font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+    .edit-req-user { color: var(--neon-cyan); font-size: 12px; }
+    .edit-btn-row { display: flex; gap: 8px; }
+ 
+    .divider { border: none; border-top: 1px solid var(--border-dim); margin: 20px 0; }
+    .mono { font-family: 'Share Tech Mono', monospace; }
+    .corner-tl { position: absolute; top: -1px; left: -1px; width: 12px; height: 12px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
+    .corner-br { position: absolute; bottom: -1px; right: -1px; width: 12px; height: 12px; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
+ 
+    /* Mini modal for add topic/subtopic */
+    .mini-modal { background: var(--bg-panel); border: 1px solid var(--neon-cyan); box-shadow: 0 0 30px rgba(0,245,255,0.2); padding: 20px; margin: 10px 0; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)); }
+    .mini-modal-title { font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 2px; color: var(--neon-cyan); margin-bottom: 12px; }
+ 
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 8px 12px; background: var(--bg-deep); border: 1px solid var(--border-dim); }
+    .filter-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 2px; white-space: nowrap; }
+    .filter-bar input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-family: 'Share Tech Mono', monospace; font-size: 12px; outline: none; }
+ 
+    /* Breadcrumb */
+    .breadcrumb { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 12px; }
+    .breadcrumb span { color: var(--neon-cyan); }
   </style>
-
+</head>
+ 
 <body>
   <div class="scanlines"></div>
   <div class="grid-bg"></div>
   <div class="app" id="root"></div>
-
+ 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script>
-    // ── Firebase ──────────────────────────────────────────────────────────────
     const firebaseConfig = {
       apiKey: "AIzaSyDG5_C6rCsaXi1sccuneUEgo4S7aIgTAUw",
       authDomain: "codebank-d05dc.firebaseapp.com",
@@ -812,23 +200,36 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
-    // ── Constants ─────────────────────────────────────────────────────────────
-    const LANGUAGES = ['javascript', 'python', 'c', 'cpp', 'java', 'rust', 'go', 'typescript', 'html', 'css', 'sql', 'bash', 'php', 'ruby', 'swift'];
+ 
+    
+    const DEFAULT_TOPICS = [
+      { name: 'C', subtopics: ['Array', 'String', 'Structure', 'Pointer', 'Function', 'File I/O', 'Linked List', 'Stack', 'Queue', 'Recursion'] },
+      { name: 'C++', subtopics: ['OOP', 'Class & Object', 'Inheritance', 'Polymorphism', 'Template', 'STL', 'Exception Handling', 'File I/O'] },
+      { name: 'Python', subtopics: ['List', 'Dictionary', 'Function', 'Class', 'File I/O', 'Module', 'Recursion', 'Sorting', 'API'] },
+      { name: 'Java', subtopics: ['OOP', 'Array', 'String', 'Collection', 'Exception', 'Thread', 'I/O Stream', 'Interface'] },
+      { name: 'Web', subtopics: ['HTML', 'CSS', 'JavaScript', 'React', 'Node.js', 'API', 'DOM', 'Fetch'] },
+      { name: 'Database', subtopics: ['SELECT', 'JOIN', 'INSERT', 'UPDATE', 'DELETE', 'Index', 'Stored Proc', 'Trigger'] },
+      { name: 'Algorithm', subtopics: ['Sorting', 'Searching', 'Dynamic Prog', 'Graph', 'Tree', 'Greedy', 'Backtracking', 'Divide & Conquer'] },
+      { name: 'Other', subtopics: ['Misc', 'Snippet', 'Script', 'Config', 'Bash', 'DevOps'] },
+    ];
+ 
+    const LANGUAGES = ['c', 'cpp', 'python', 'java', 'javascript', 'typescript', 'html', 'css', 'sql', 'bash', 'php', 'ruby', 'swift', 'rust', 'go'];
     const EXPIRY_TYPES = [
       { value: 'one-time', label: '🔥 One-Time View', desc: 'Receiver can view only once' },
       { value: '25min', label: '⚡ 25 Min Auto-Expire', desc: 'Expires 25 min after sharing' },
       { value: 'infinite', label: '∞ No Expiry', desc: 'Available forever for receiver' }
     ];
-
-    // ── Local DB (mirror of Firestore) ────────────────────────────────────────
-    const DB = { users: [], snippets: [] };
-
-    // ── Firestore helpers ─────────────────────────────────────────────────────
-    async function fbSaveUser(u) { try { await db.collection('users').doc(u.id).set(u); } catch (e) { console.error(e); } }
-    async function fbSaveSnippet(s) { try { await db.collection('snippets').doc(s.id).set(s); } catch (e) { console.error(e); } }
-    async function fbDeleteSnippet(id) { try { await db.collection('snippets').doc(id).delete(); } catch (e) { console.error(e); } }
-
+ 
+    const DB = { users: [], snippets: [], topics: [] };
+ 
+    
+    async function fbSaveUser(u) { try { await db.collection('users').doc(u.id).set(u); } catch(e) { console.error(e); } }
+    async function fbSaveSnippet(s) { try { await db.collection('snippets').doc(s.id).set(s); } catch(e) { console.error(e); } }
+    async function fbDeleteSnippet(id) { try { await db.collection('snippets').doc(id).delete(); } catch(e) { console.error(e); } }
+    async function fbSaveTopics(userId, topics) {
+      try { await db.collection('topics').doc(userId).set({ topics }); } catch(e) { console.error(e); }
+    }
+ 
     async function fbLoad() {
       try {
         const [uSnap, sSnap] = await Promise.all([
@@ -837,402 +238,619 @@
         ]);
         DB.users = uSnap.docs.map(d => d.data());
         DB.snippets = sSnap.docs.map(d => { const s = d.data(); if (!s.editRequests) s.editRequests = []; return s; });
-      } catch (e) { console.error('fbLoad:', e); }
+      } catch(e) { console.error('fbLoad:', e); }
     }
-
-    // ── State ─────────────────────────────────────────────────────────────────
+ 
+    async function fbLoadTopics(userId) {
+      try {
+        const doc = await db.collection('topics').doc(userId).get();
+        if (doc.exists) return doc.data().topics;
+      } catch(e) { console.error(e); }
+      return null;
+    }
+ 
+    
     let S = {
-      view: 'auth',        // 'auth' | 'app'
-      authTab: 'login',    // 'login' | 'register'
-      user: null,
-      tab: 'vault',        // 'vault' | 'new' | 'users'
-      alert: null,
-      // auth forms
+      view: 'auth', authTab: 'login', user: null, tab: 'vault', alert: null,
       lf: { username: '', password: '' },
       rf: { username: '', password: '', confirm: '' },
-      // vault
-      selId: null,         // selected snippet id
-      // new snippet form
-      nf: { name: '', desc: '', lang: 'python', expiry: 'infinite', code: '' },
+      selId: null,
+      nf: { name: '', desc: '', lang: 'c', expiry: 'infinite', code: '', topic: '', subtopic: '' },
       shareResult: null,
-      // edit
-      editId: null,
-      ef: null,            // { name, desc, lang, code }
-      // edit request
-      erSnippetId: null,
-      erMsg: ''
+      editId: null, ef: null,
+      erSnippetId: null, erMsg: '',
+      // topic tree state
+      userTopics: [],          // [{name, subtopics:[]}]
+      openTopics: {},          // { topicName: true/false }
+      filterTopic: null,       // null = show all
+      filterSubtopic: null,
+      searchQ: '',
+      // add topic/subtopic UI
+      showAddTopic: false,
+      newTopicName: '',
+      showAddSubtopic: null,   // topic name
+      newSubtopicName: '',
     };
-
+ 
     function set(patch) { Object.assign(S, patch); render(); }
     function now() { return Date.now(); }
     function uid() { return Math.random().toString(36).substr(2, 8).toUpperCase(); }
-    function uuid() { return [4, 4, 4, 4, 12].map(n => Math.random().toString(36).substr(2, n).toUpperCase()).join('-'); }
-    function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function uuid() { return [4,4,4,4,12].map(n => Math.random().toString(36).substr(2,n).toUpperCase()).join('-'); }
+    function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function ago(ts) {
-      const d = now() - ts;
-      if (d < 60000) return 'just now';
-      if (d < 3600000) return Math.floor(d / 60000) + 'm ago';
-      if (d < 86400000) return Math.floor(d / 3600000) + 'h ago';
-      return Math.floor(d / 86400000) + 'd ago';
+      const d = now()-ts;
+      if(d<60000) return 'just now';
+      if(d<3600000) return Math.floor(d/60000)+'m ago';
+      if(d<86400000) return Math.floor(d/3600000)+'h ago';
+      return Math.floor(d/86400000)+'d ago';
     }
     function expiryBadge(t) {
-      if (t === 'one-time') return '<span class="badge badge-onetime">🔥 ONE-TIME</span>';
-      if (t === '25min') return '<span class="badge badge-25min">⚡ 25MIN</span>';
+      if(t==='one-time') return '<span class="badge badge-onetime">🔥 ONE-TIME</span>';
+      if(t==='25min') return '<span class="badge badge-25min">⚡ 25MIN</span>';
       return '<span class="badge badge-infinite">∞ INFINITE</span>';
     }
-    function shareUrl(id) { return window.location.href.split('?')[0] + '?snippet=' + id; }
-
-    function alert_(type, msg, ms = 3500) {
-      set({ alert: { type, msg } });
-      setTimeout(() => set({ alert: null }), ms);
-    }
-
-    // ── Clipboard ─────────────────────────────────────────────────────────────
+    function shareUrl(id) { return window.location.href.split('?')[0]+'?snippet='+id; }
+    function alert_(type, msg, ms=3500) { set({alert:{type,msg}}); setTimeout(()=>set({alert:null}), ms); }
     function copyText(text) {
-      if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => { });
-      alert_('success', '[COPIED] Data buffered');
+      if(navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
+      alert_('success','[COPIED] Data buffered');
     }
-
-    // ── Auth handlers ─────────────────────────────────────────────────────────
+ 
+  
+    function getTopics() { return S.userTopics; }
+ 
+    function getSubtopicsForTopic(topicName) {
+      const t = S.userTopics.find(x => x.name === topicName);
+      return t ? t.subtopics : [];
+    }
+ 
+    function countSnippetsForSubtopic(topic, subtopic) {
+      return DB.snippets.filter(s => s.ownerId === S.user.id && s.topic === topic && s.subtopic === subtopic).length;
+    }
+    function countSnippetsForTopic(topic) {
+      return DB.snippets.filter(s => s.ownerId === S.user.id && s.topic === topic).length;
+    }
+ 
+    async function doAddTopic() {
+      const name = S.newTopicName.trim();
+      if (!name) { alert_('error', '[ERROR] Topic name required'); return; }
+      if (S.userTopics.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+        alert_('error', '[ERROR] Topic already exists'); return;
+      }
+      S.userTopics.push({ name, subtopics: [] });
+      await fbSaveTopics(S.user.id, S.userTopics);
+      set({ showAddTopic: false, newTopicName: '' });
+      alert_('success', '[SAVED] Topic added');
+    }
+ 
+    async function doAddSubtopic() {
+      const name = S.newSubtopicName.trim();
+      const topicName = S.showAddSubtopic;
+      if (!name) { alert_('error', '[ERROR] Subtopic name required'); return; }
+      const t = S.userTopics.find(x => x.name === topicName);
+      if (!t) return;
+      if (t.subtopics.includes(name)) { alert_('error', '[ERROR] Subtopic already exists'); return; }
+      t.subtopics.push(name);
+      await fbSaveTopics(S.user.id, S.userTopics);
+      set({ showAddSubtopic: null, newSubtopicName: '' });
+      alert_('success', '[SAVED] Subtopic added');
+    }
+ 
+    async function doDeleteSubtopic(topicName, sub) {
+      if (!confirm(`Delete subtopic "${sub}"?`)) return;
+      const t = S.userTopics.find(x => x.name === topicName);
+      if (t) t.subtopics = t.subtopics.filter(s => s !== sub);
+      await fbSaveTopics(S.user.id, S.userTopics);
+      render();
+    }
+ 
+    async function doDeleteTopic(topicName) {
+      if (!confirm(`Delete topic "${topicName}" and all subtopics?`)) return;
+      S.userTopics = S.userTopics.filter(t => t.name !== topicName);
+      await fbSaveTopics(S.user.id, S.userTopics);
+      if (S.filterTopic === topicName) set({ filterTopic: null, filterSubtopic: null });
+      else render();
+    }
+ 
+  
     async function doLogin() {
-      alert_('info', '[SYNCING] Connecting...', 99999);
+      alert_('info','[SYNCING] Connecting...',99999);
       await fbLoad();
-      const u = DB.users.find(u => u.username === S.lf.username && u.password === S.lf.password);
-      if (!u) { alert_('error', '[DENIED] Invalid credentials'); return; }
-      set({ user: u, view: 'app', tab: 'vault', alert: null, selId: null });
+      const u = DB.users.find(u => u.username===S.lf.username && u.password===S.lf.password);
+      if (!u) { alert_('error','[DENIED] Invalid credentials'); return; }
+      // load topics
+      let topics = await fbLoadTopics(u.id);
+      if (!topics) {
+        topics = DEFAULT_TOPICS.map(t => ({ name: t.name, subtopics: [...t.subtopics] }));
+        await fbSaveTopics(u.id, topics);
+      }
+      set({ user: u, view: 'app', tab: 'vault', alert: null, selId: null, userTopics: topics });
     }
-
+ 
     async function doRegister() {
       const { username, password, confirm } = S.rf;
-      if (!username || !password) { alert_('error', '[ERROR] Fill all fields'); return; }
-      if (password !== confirm) { alert_('error', '[ERROR] Passwords mismatch'); return; }
-      alert_('info', '[SYNCING] Checking...', 99999);
+      if (!username || !password) { alert_('error','[ERROR] Fill all fields'); return; }
+      if (password !== confirm) { alert_('error','[ERROR] Passwords mismatch'); return; }
+      alert_('info','[SYNCING] Checking...',99999);
       await fbLoad();
-      if (DB.users.find(u => u.username === username)) { alert_('error', '[ERROR] Username taken'); return; }
-      const user = { id: 'USR-' + uid(), username, password, role: 'user', created: now() };
+      if (DB.users.find(u => u.username===username)) { alert_('error','[ERROR] Username taken'); return; }
+      const user = { id:'USR-'+uid(), username, password, role:'user', created:now() };
       DB.users.push(user);
       await fbSaveUser(user);
-      set({ user, view: 'app', tab: 'vault', alert: null, selId: null });
+      const topics = DEFAULT_TOPICS.map(t => ({ name: t.name, subtopics: [...t.subtopics] }));
+      await fbSaveTopics(user.id, topics);
+      set({ user, view:'app', tab:'vault', alert:null, selId:null, userTopics: topics });
     }
+ 
 
-    // ── Snippet handlers ──────────────────────────────────────────────────────
     async function doCreateSnippet() {
-      const { name, desc, lang, expiry, code } = S.nf;
-      if (!name || !code) { alert_('error', '[ERROR] Name and code required'); return; }
+      const { name, desc, lang, expiry, code, topic, subtopic } = S.nf;
+      if (!name || !code) { alert_('error','[ERROR] Name and code required'); return; }
       const id = uuid();
       const snippet = {
         id, ownerId: S.user.id, ownerName: S.user.username,
         projectName: name, description: desc, language: lang,
         expiryType: expiry, code,
-        created: now(), accessed: 0,
-        editRequests: [],
-        expiresAt: expiry === '25min' ? now() + 25 * 60 * 1000 : null
+        topic: topic || '', subtopic: subtopic || '',
+        created: now(), accessed: 0, editRequests: [],
+        expiresAt: expiry==='25min' ? now()+25*60*1000 : null
       };
       DB.snippets.push(snippet);
       await fbSaveSnippet(snippet);
-      set({ shareResult: shareUrl(id), nf: { name: '', desc: '', lang: 'python', expiry: 'infinite', code: '' }, selId: id, tab: 'vault' });
-      alert_('success', '[SAVED] Snippet stored in your vault');
+      set({ shareResult: shareUrl(id), nf: { name:'', desc:'', lang:'c', expiry:'infinite', code:'', topic:'', subtopic:'' }, selId: id, tab:'vault' });
+      alert_('success','[SAVED] Snippet stored in your vault');
     }
-
+ 
     async function doSaveEdit() {
       const ef = S.ef;
-      if (!ef || !ef.name || !ef.code) { alert_('error', '[ERROR] Name and code required'); return; }
-      const s = DB.snippets.find(x => x.id === S.editId);
+      if (!ef || !ef.name || !ef.code) { alert_('error','[ERROR] Name and code required'); return; }
+      const s = DB.snippets.find(x => x.id===S.editId);
       if (!s) return;
-      s.projectName = ef.name; s.description = ef.desc;
-      s.language = ef.lang; s.code = ef.code;
+      s.projectName=ef.name; s.description=ef.desc; s.language=ef.lang; s.code=ef.code;
+      s.topic=ef.topic||''; s.subtopic=ef.subtopic||'';
       await fbSaveSnippet(s);
-      set({ editId: null, ef: null });
-      alert_('success', '[SAVED] Changes saved');
+      set({ editId:null, ef:null });
+      alert_('success','[SAVED] Changes saved');
     }
-
+ 
     async function doDelete(id) {
       if (!confirm('Permanently delete this snippet?')) return;
-      DB.snippets = DB.snippets.filter(s => s.id !== id);
+      DB.snippets = DB.snippets.filter(s => s.id!==id);
       await fbDeleteSnippet(id);
-      set({ selId: null });
-      alert_('success', '[DELETED] Snippet removed');
+      set({ selId:null });
+      alert_('success','[DELETED] Snippet removed');
     }
-
+ 
     async function doSendEditRequest() {
-      if (!S.erMsg.trim()) { alert_('error', '[ERROR] Write a message'); return; }
-      const s = DB.snippets.find(x => x.id === S.erSnippetId);
+      if (!S.erMsg.trim()) { alert_('error','[ERROR] Write a message'); return; }
+      const s = DB.snippets.find(x => x.id===S.erSnippetId);
       if (!s) return;
-      s.editRequests.push({ from: S.user.id, fromName: S.user.username, msg: S.erMsg, time: now() });
+      s.editRequests.push({ from:S.user.id, fromName:S.user.username, msg:S.erMsg, time:now() });
       await fbSaveSnippet(s);
-      set({ erSnippetId: null, erMsg: '' });
-      alert_('success', '[SENT] Request transmitted');
+      set({ erSnippetId:null, erMsg:'' });
+      alert_('success','[SENT] Request transmitted');
     }
-
+ 
     async function doApproveEdit(snippetId, ri) {
-      const s = DB.snippets.find(x => x.id === snippetId);
-      if (s) { s.editRequests.splice(ri, 1); await fbSaveSnippet(s); }
-      alert_('success', '[GRANTED] Edit access approved');
+      const s = DB.snippets.find(x => x.id===snippetId);
+      if (s) { s.editRequests.splice(ri,1); await fbSaveSnippet(s); }
+      alert_('success','[GRANTED] Edit access approved');
       render();
     }
-
+ 
     async function doDenyEdit(snippetId, ri) {
-      const s = DB.snippets.find(x => x.id === snippetId);
-      if (s) { s.editRequests.splice(ri, 1); await fbSaveSnippet(s); }
+      const s = DB.snippets.find(x => x.id===snippetId);
+      if (s) { s.editRequests.splice(ri,1); await fbSaveSnippet(s); }
       render();
     }
-
-    // ── Render helpers ────────────────────────────────────────────────────────
+ 
+    
     function renderAlert() {
       if (!S.alert) return '';
       return `<div class="alert alert-${S.alert.type}">${S.alert.msg}</div>`;
     }
-
-    // ── AUTH SCREEN ───────────────────────────────────────────────────────────
+ 
+    
     function renderAuth() {
       return `
-    <div class="auth-screen">
-      <div class="auth-box">
-        <div class="corner-tl"></div><div class="corner-br"></div>
-        <div class="auth-logo">CODE<span>789</span></div>
-        <div class="auth-sub">// SECURE CODE VAULT v3.0</div>
-        ${renderAlert()}
-        <div class="auth-tabs">
-          <button class="auth-tab ${S.authTab === 'login' ? 'active' : ''}" onclick="set({authTab:'login'})">LOGIN</button>
-          <button class="auth-tab ${S.authTab === 'register' ? 'active' : ''}" onclick="set({authTab:'register'})">REGISTER</button>
-        </div>
-        ${S.authTab === 'login' ? `
-          <div class="field"><label>// Username</label>
-            <input type="text" value="${S.lf.username}" placeholder="username"
-              oninput="S.lf.username=this.value"
-              onkeydown="if(event.key==='Enter')doLogin()" /></div>
-          <div class="field"><label>// Password</label>
-            <input type="password" value="${S.lf.password}" placeholder="••••••••"
-              oninput="S.lf.password=this.value"
-              onkeydown="if(event.key==='Enter')doLogin()" /></div>
-          <button class="btn btn-cyan btn-full" onclick="doLogin()">INITIALIZE SESSION</button>
-        ` : `
-          <div class="field"><label>// Username</label>
-            <input type="text" value="${S.rf.username}" placeholder="choose username" oninput="S.rf.username=this.value" /></div>
-          <div class="field"><label>// Password</label>
-            <input type="password" value="${S.rf.password}" placeholder="min 6 chars" oninput="S.rf.password=this.value" /></div>
-          <div class="field"><label>// Confirm</label>
-            <input type="password" value="${S.rf.confirm}" placeholder="repeat password"
-              oninput="S.rf.confirm=this.value"
-              onkeydown="if(event.key==='Enter')doRegister()" /></div>
-          <button class="btn btn-green btn-full" onclick="doRegister()">CREATE ACCOUNT</button>
-        `}
-      </div>
-    </div>`;
-    }
-
-    // ── VAULT (Dashboard) ─────────────────────────────────────────────────────
-    function renderVault() {
-      const mine = DB.snippets.filter(s => s.ownerId === S.user.id);
-      const sel = mine.find(s => s.id === S.selId) || null;
-
-      // If editing, show edit panel instead of detail
-      if (S.editId) {
-        const s = DB.snippets.find(x => x.id === S.editId);
-        if (!S.ef) S.ef = { name: s.projectName, desc: s.description || '', lang: s.language, code: s.code };
-        return `
-      <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
-        ${renderSnippetList(mine, sel)}
-        <div class="panel" style="margin-bottom:0">
-          <div class="panel-title">EDIT SNIPPET</div>
-          <div class="grid-2" style="margin-bottom:12px">
-            <div class="field" style="margin-bottom:0"><label>// Project Name</label>
-              <input type="text" value="${esc(S.ef.name)}" oninput="S.ef.name=this.value" /></div>
-            <div class="field" style="margin-bottom:0"><label>// Description</label>
-              <input type="text" value="${esc(S.ef.desc)}" oninput="S.ef.desc=this.value" /></div>
+      <div class="auth-screen">
+        <div class="auth-box">
+          <div class="corner-tl"></div><div class="corner-br"></div>
+          <div class="auth-logo">CODE<span>789</span></div>
+          <div class="auth-sub">// SECURE CODE VAULT v3.1</div>
+          ${renderAlert()}
+          <div class="auth-tabs">
+            <button class="auth-tab ${S.authTab==='login'?'active':''}" onclick="set({authTab:'login'})">LOGIN</button>
+            <button class="auth-tab ${S.authTab==='register'?'active':''}" onclick="set({authTab:'register'})">REGISTER</button>
           </div>
-          <div class="field" style="margin-bottom:12px"><label>// Language</label>
-            <select oninput="S.ef.lang=this.value">
-              ${LANGUAGES.map(l => `<option value="${l}" ${S.ef.lang === l ? 'selected' : ''}>${l}</option>`).join('')}
-            </select></div>
-          <div class="field"><label>// Code</label>
-            <textarea style="min-height:300px;color:var(--text-primary);font-size:13px"
-              oninput="S.ef.code=this.value">${esc(S.ef.code)}</textarea></div>
-          <div style="display:flex;gap:10px;margin-top:4px">
-            <button class="btn btn-green" onclick="doSaveEdit()">SAVE CHANGES</button>
-            <button class="btn btn-pink" onclick="set({editId:null,ef:null})">CANCEL</button>
-          </div>
+          ${S.authTab==='login' ? `
+            <div class="field"><label>// Username</label>
+              <input type="text" value="${S.lf.username}" placeholder="username"
+                oninput="S.lf.username=this.value"
+                onkeydown="if(event.key==='Enter')doLogin()" /></div>
+            <div class="field"><label>// Password</label>
+              <input type="password" value="${S.lf.password}" placeholder="••••••••"
+                oninput="S.lf.password=this.value"
+                onkeydown="if(event.key==='Enter')doLogin()" /></div>
+            <button class="btn btn-cyan btn-full" onclick="doLogin()">INITIALIZE SESSION</button>
+          ` : `
+            <div class="field"><label>// Username</label>
+              <input type="text" value="${S.rf.username}" placeholder="choose username" oninput="S.rf.username=this.value" /></div>
+            <div class="field"><label>// Password</label>
+              <input type="password" value="${S.rf.password}" placeholder="min 6 chars" oninput="S.rf.password=this.value" /></div>
+            <div class="field"><label>// Confirm</label>
+              <input type="password" value="${S.rf.confirm}" placeholder="repeat password"
+                oninput="S.rf.confirm=this.value"
+                onkeydown="if(event.key==='Enter')doRegister()" /></div>
+            <button class="btn btn-green btn-full" onclick="doRegister()">CREATE ACCOUNT</button>
+          `}
         </div>
       </div>`;
+    }
+
+    function renderTopicTree() {
+      const topics = S.userTopics;
+      return `
+      <div class="topic-tree" style="margin-bottom:0">
+        <div class="topic-tree-header">
+          <span>📁 TOPICS</span>
+          <button class="btn btn-cyan btn-sm" onclick="set({showAddTopic:!S.showAddTopic,newTopicName:''})" style="clip-path:none;padding:3px 10px;font-size:9px">+ TOPIC</button>
+        </div>
+ 
+        ${S.showAddTopic ? `
+        <div class="mini-modal" style="margin:8px;clip-path:none;">
+          <div class="mini-modal-title">NEW TOPIC</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" placeholder="Topic name..." value="${esc(S.newTopicName)}"
+              oninput="S.newTopicName=this.value"
+              onkeydown="if(event.key==='Enter')doAddTopic()"
+              style="flex:1;background:var(--bg-deep);border:1px solid var(--border-dim);color:var(--text-primary);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 10px;outline:none" />
+            <button class="btn btn-green btn-sm" onclick="doAddTopic()" style="clip-path:none">ADD</button>
+            <button class="btn btn-pink btn-sm" onclick="set({showAddTopic:false})" style="clip-path:none">✕</button>
+          </div>
+        </div>` : ''}
+ 
+        <div style="max-height:calc(100vh - 280px);overflow-y:auto">
+          <!-- All Snippets -->
+          <div class="topic-item">
+            <div class="topic-name ${!S.filterTopic ? 'active-topic' : ''}"
+                 onclick="set({filterTopic:null,filterSubtopic:null,selId:null})">
+              <span>📋 ALL SNIPPETS</span>
+              <span class="subtopic-count">${DB.snippets.filter(s=>s.ownerId===S.user.id).length}</span>
+            </div>
+          </div>
+ 
+          ${topics.map(t => {
+            const isOpen = S.openTopics[t.name];
+            const isActive = S.filterTopic === t.name;
+            return `
+            <div class="topic-item">
+              <div class="topic-name ${isActive && !S.filterSubtopic ? 'active-topic' : ''}"
+                   onclick="handleTopicClick('${esc(t.name)}')">
+                <span>
+                  <span class="topic-arrow ${isOpen ? 'open' : ''}">▶</span>
+                  &nbsp;${esc(t.name)}
+                </span>
+                <span style="display:flex;align-items:center;gap:4px">
+                  <span class="subtopic-count">${countSnippetsForTopic(t.name)}</span>
+                  <button onclick="event.stopPropagation();set({showAddSubtopic:'${esc(t.name)}',newSubtopicName:'',showAddTopic:false})"
+                    style="background:none;border:1px solid rgba(0,245,255,0.2);color:rgba(0,245,255,0.5);font-size:9px;cursor:pointer;padding:1px 5px;font-family:'Share Tech Mono',monospace">+</button>
+                  <button onclick="event.stopPropagation();doDeleteTopic('${esc(t.name)}')"
+                    style="background:none;border:none;color:rgba(255,7,58,0.4);font-size:11px;cursor:pointer;padding:1px 3px">×</button>
+                </span>
+              </div>
+              ${S.showAddSubtopic === t.name ? `
+              <div style="padding:8px 12px;background:rgba(0,0,0,0.3)">
+                <div style="display:flex;gap:6px">
+                  <input type="text" placeholder="Subtopic name..." value="${esc(S.newSubtopicName)}"
+                    oninput="S.newSubtopicName=this.value"
+                    onkeydown="if(event.key==='Enter')doAddSubtopic()"
+                    style="flex:1;background:var(--bg-deep);border:1px solid var(--border-dim);color:var(--text-primary);font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 8px;outline:none" />
+                  <button class="btn btn-green btn-sm" onclick="doAddSubtopic()" style="clip-path:none;padding:4px 10px">ADD</button>
+                  <button class="btn btn-pink btn-sm" onclick="set({showAddSubtopic:null})" style="clip-path:none;padding:4px 8px">✕</button>
+                </div>
+              </div>` : ''}
+              <div class="subtopic-list ${isOpen ? 'open' : ''}">
+                ${t.subtopics.map(sub => {
+                  const cnt = countSnippetsForSubtopic(t.name, sub);
+                  const isActiveSub = S.filterTopic === t.name && S.filterSubtopic === sub;
+                  return `
+                  <div class="subtopic-item ${isActiveSub ? 'active' : ''}"
+                       onclick="set({filterTopic:'${esc(t.name)}',filterSubtopic:'${esc(sub)}',selId:null})">
+                    <span>↳ ${esc(sub)}</span>
+                    <span style="display:flex;align-items:center;gap:4px">
+                      <span class="subtopic-count">${cnt}</span>
+                      <button onclick="event.stopPropagation();doDeleteSubtopic('${esc(t.name)}','${esc(sub)}')"
+                        style="background:none;border:none;color:rgba(255,7,58,0.3);font-size:11px;cursor:pointer;padding:0 2px">×</button>
+                    </span>
+                  </div>`;
+                }).join('')}
+                ${t.subtopics.length === 0 ? `<div style="padding:8px 30px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">// no subtopics</div>` : ''}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+ 
+    function handleTopicClick(topicName) {
+      const wasOpen = S.openTopics[topicName];
+      S.openTopics[topicName] = !wasOpen;
+      set({ filterTopic: topicName, filterSubtopic: null, selId: null });
+    }
+ 
+  
+    function renderVault() {
+      let mine = DB.snippets.filter(s => s.ownerId === S.user.id);
+ 
+      // filter by topic/subtopic
+      if (S.filterTopic) mine = mine.filter(s => s.topic === S.filterTopic);
+      if (S.filterSubtopic) mine = mine.filter(s => s.subtopic === S.filterSubtopic);
+      // search
+      if (S.searchQ) {
+        const q = S.searchQ.toLowerCase();
+        mine = mine.filter(s =>
+          s.projectName.toLowerCase().includes(q) ||
+          (s.description||'').toLowerCase().includes(q) ||
+          s.language.toLowerCase().includes(q)
+        );
       }
-
-      return `
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value">${mine.length}</div><div class="stat-label">Snippets</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--neon-pink)">${mine.reduce((a, s) => a + s.editRequests.length, 0)}</div><div class="stat-label">Edit Requests</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--neon-green)">${mine.reduce((a, s) => a + s.accessed, 0)}</div><div class="stat-label">Total Views</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:${sel ? '300px 1fr' : '1fr'};gap:16px;align-items:start">
-      ${renderSnippetList(mine, sel)}
-      ${sel ? renderSnippetDetail(sel) : ''}
-    </div>`;
-    }
-
-    function renderSnippetList(mine, sel) {
-      return `
-    <div class="panel" style="margin-bottom:0">
-      <div class="panel-title">MY VAULT</div>
-      ${mine.length === 0
-          ? `<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:12px;text-align:center;padding:30px">// Empty. Add your first snippet.</div>`
-          : mine.map(s => `
-        <div class="snippet-card ${S.selId === s.id ? 'snippet-card-active' : ''}"
-             onclick="set({selId:'${s.id}',editId:null,ef:null})">
-          <div class="snippet-card-header">
-            <div class="snippet-project">${esc(s.projectName)}</div>
-            ${expiryBadge(s.expiryType)}
+ 
+      const sel = mine.find(s => s.id === S.selId) || null;
+ 
+      if (S.editId) {
+        const s = DB.snippets.find(x => x.id===S.editId);
+        if (!S.ef) S.ef = { name:s.projectName, desc:s.description||'', lang:s.language, code:s.code, topic:s.topic||'', subtopic:s.subtopic||'' };
+        return `
+        <div style="display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:start">
+          ${renderTopicTree()}
+          <div class="panel" style="margin-bottom:0">
+            <div class="panel-title">EDIT SNIPPET</div>
+            <div class="grid-2" style="margin-bottom:12px">
+              <div class="field" style="margin-bottom:0"><label>// Project Name</label>
+                <input type="text" value="${esc(S.ef.name)}" oninput="S.ef.name=this.value" /></div>
+              <div class="field" style="margin-bottom:0"><label>// Description</label>
+                <input type="text" value="${esc(S.ef.desc)}" oninput="S.ef.desc=this.value" /></div>
+            </div>
+            <div class="grid-3" style="margin-bottom:12px">
+              <div class="field" style="margin-bottom:0"><label>// Language</label>
+                <select oninput="S.ef.lang=this.value">
+                  ${LANGUAGES.map(l=>`<option value="${l}" ${S.ef.lang===l?'selected':''}>${l}</option>`).join('')}
+                </select></div>
+              <div class="field" style="margin-bottom:0"><label>// Topic</label>
+                <select oninput="S.ef.topic=this.value;S.ef.subtopic='';render()">
+                  <option value="">-- None --</option>
+                  ${S.userTopics.map(t=>`<option value="${esc(t.name)}" ${S.ef.topic===t.name?'selected':''}>${esc(t.name)}</option>`).join('')}
+                </select></div>
+              <div class="field" style="margin-bottom:0"><label>// Subtopic</label>
+                <select oninput="S.ef.subtopic=this.value">
+                  <option value="">-- None --</option>
+                  ${(S.ef.topic ? getSubtopicsForTopic(S.ef.topic) : []).map(sub=>`<option value="${esc(sub)}" ${S.ef.subtopic===sub?'selected':''}>${esc(sub)}</option>`).join('')}
+                </select></div>
+            </div>
+            <div class="field"><label>// Code</label>
+              <textarea style="min-height:300px;color:var(--text-primary);font-size:13px"
+                oninput="S.ef.code=this.value">${esc(S.ef.code)}</textarea></div>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <button class="btn btn-green" onclick="doSaveEdit()">SAVE CHANGES</button>
+              <button class="btn btn-pink" onclick="set({editId:null,ef:null})">CANCEL</button>
+            </div>
           </div>
-          <div class="snippet-desc">${esc(s.description || '// no description')}</div>
-          <div class="snippet-meta">
-            <span class="badge badge-lang">${s.language}</span>
-            <span class="badge-id">· ${ago(s.created)}</span>
-            ${s.editRequests.length > 0 ? `<span class="badge badge-onetime">📨 ${s.editRequests.length} req</span>` : ''}
+        </div>`;
+      }
+ 
+      const allMine = DB.snippets.filter(s => s.ownerId===S.user.id);
+ 
+      return `
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value">${allMine.length}</div><div class="stat-label">Snippets</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--neon-purple)">${S.userTopics.length}</div><div class="stat-label">Topics</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--neon-pink)">${allMine.reduce((a,s)=>a+s.editRequests.length,0)}</div><div class="stat-label">Edit Requests</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--neon-green)">${allMine.reduce((a,s)=>a+s.accessed,0)}</div><div class="stat-label">Total Views</div></div>
+      </div>
+      <div class="${sel ? 'vault-layout' : 'vault-layout-2'}">
+        ${renderTopicTree()}
+        <div style="margin-bottom:0">
+          <div class="panel" style="margin-bottom:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="panel-title" style="margin-bottom:0">
+                ${S.filterSubtopic ? `${esc(S.filterTopic)} › ${esc(S.filterSubtopic)}` : S.filterTopic ? esc(S.filterTopic) : 'MY VAULT'}
+              </div>
+              <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">${mine.length} snippets</span>
+            </div>
+            <div class="filter-bar">
+              <span class="filter-label">SEARCH //</span>
+              <input type="text" placeholder="search snippets..." value="${esc(S.searchQ)}"
+                oninput="S.searchQ=this.value;render()" />
+              ${S.searchQ ? `<button onclick="set({searchQ:''})" style="background:none;border:none;color:var(--neon-pink);cursor:pointer;font-size:14px">✕</button>` : ''}
+            </div>
+            ${mine.length===0
+              ? `<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:12px;text-align:center;padding:30px">
+                  // No snippets${S.filterSubtopic?' in this subtopic':S.filterTopic?' in this topic':''}.<br>
+                  <span style="font-size:10px">Use "+ NEW SNIPPET" to add one.</span>
+                </div>`
+              : mine.map(s => `
+                <div class="snippet-card ${S.selId===s.id?'snippet-card-active':''}"
+                     onclick="set({selId:'${s.id}',editId:null,ef:null})">
+                  <div class="snippet-card-header">
+                    <div class="snippet-project">${esc(s.projectName)}</div>
+                    ${expiryBadge(s.expiryType)}
+                  </div>
+                  <div class="snippet-desc">${esc(s.description||'// no description')}</div>
+                  <div class="snippet-meta">
+                    <span class="badge badge-lang">${s.language}</span>
+                    ${s.topic ? `<span class="badge badge-topic">${esc(s.topic)}${s.subtopic?' › '+esc(s.subtopic):''}</span>` : ''}
+                    <span class="badge-id">· ${ago(s.created)}</span>
+                    ${s.editRequests.length>0?`<span class="badge badge-onetime">📨 ${s.editRequests.length}</span>`:''}
+                  </div>
+                </div>`).join('')}
           </div>
-        </div>`).join('')}
-    </div>`;
+        </div>
+        ${sel ? renderSnippetDetail(sel) : ''}
+      </div>`;
     }
-
+ 
     function renderSnippetDetail(s) {
       return `
-    <div class="panel" style="margin-bottom:0">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
-        <div>
-          <div class="snippet-project" style="font-size:15px;margin-bottom:4px">${esc(s.projectName)}</div>
-          <div class="snippet-desc">${esc(s.description || '// no description')}</div>
+      <div class="panel" style="margin-bottom:0">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div class="snippet-project" style="font-size:15px;margin-bottom:4px">${esc(s.projectName)}</div>
+            <div class="snippet-desc">${esc(s.description||'// no description')}</div>
+          </div>
+          <button onclick="set({selId:null})"
+            style="background:none;border:none;color:var(--neon-pink);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">✕</button>
         </div>
-        <button onclick="set({selId:null})"
-          style="background:none;border:none;color:var(--neon-pink);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">✕</button>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-        <span class="badge badge-lang">${s.language}</span>
-        ${expiryBadge(s.expiryType)}
-        <span class="badge-id" style="align-self:center">· ${s.accessed} views · ${ago(s.created)}</span>
-      </div>
- 
-      <div class="code-display" oncontextmenu="return false"
-           style="position:relative;max-height:420px;overflow-y:auto;user-select:text;-webkit-user-select:text">
-        ${esc(s.code)}
-      </div>
- 
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-        <button class="btn btn-green btn-sm"
-          onclick="(()=>{const sn=DB.snippets.find(x=>x.id==='${s.id}');sn&&navigator.clipboard&&navigator.clipboard.writeText(sn.code).then(()=>alert_('success','[COPIED] Code copied'))})()">
-          COPY CODE</button>
-        <button class="btn btn-cyan btn-sm"
-          onclick="copyText('${shareUrl(s.id)}')">
-          COPY SHARE LINK</button>
-        <button class="btn btn-amber btn-sm"
-          onclick="set({editId:'${s.id}',ef:null})">EDIT</button>
-        <button class="btn btn-pink btn-sm"
-          onclick="doDelete('${s.id}')">DELETE</button>
-      </div>
- 
-      ${s.editRequests.length > 0 ? `
-      <hr class="divider">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--neon-pink);letter-spacing:2px;margin-bottom:10px">📨 EDIT REQUESTS</div>
-      ${s.editRequests.map((r, ri) => `
-        <div class="edit-req">
-          <div class="edit-req-info">
-            <div class="edit-req-user">${esc(r.fromName)}</div>
-            <div style="font-size:10px;color:var(--text-secondary);margin-top:3px">"${esc(r.msg)}"</div>
-          </div>
-          <div class="edit-btn-row">
-            <button class="btn btn-green btn-sm" onclick="doApproveEdit('${s.id}',${ri})">GRANT</button>
-            <button class="btn btn-pink btn-sm" onclick="doDenyEdit('${s.id}',${ri})">DENY</button>
-          </div>
-        </div>`).join('')}` : ``}
-    </div>`;
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <span class="badge badge-lang">${s.language}</span>
+          ${expiryBadge(s.expiryType)}
+          ${s.topic ? `<span class="badge badge-topic">${esc(s.topic)}${s.subtopic?' › '+esc(s.subtopic):''}</span>` : ''}
+          <span class="badge-id" style="align-self:center">· ${s.accessed} views · ${ago(s.created)}</span>
+        </div>
+        <div class="code-display" oncontextmenu="return false"
+             style="max-height:380px;overflow-y:auto;user-select:text;-webkit-user-select:text">
+          ${esc(s.code)}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <button class="btn btn-green btn-sm"
+            onclick="(()=>{const sn=DB.snippets.find(x=>x.id==='${s.id}');sn&&navigator.clipboard&&navigator.clipboard.writeText(sn.code).then(()=>alert_('success','[COPIED] Code copied'))})()">
+            COPY CODE</button>
+          <button class="btn btn-cyan btn-sm" onclick="copyText('${shareUrl(s.id)}')">COPY SHARE LINK</button>
+          <button class="btn btn-amber btn-sm" onclick="set({editId:'${s.id}',ef:null})">EDIT</button>
+          <button class="btn btn-pink btn-sm" onclick="doDelete('${s.id}')">DELETE</button>
+        </div>
+        ${s.editRequests.length>0 ? `
+        <hr class="divider">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--neon-pink);letter-spacing:2px;margin-bottom:10px">📨 EDIT REQUESTS</div>
+        ${s.editRequests.map((r,ri) => `
+          <div class="edit-req">
+            <div class="edit-req-info">
+              <div class="edit-req-user">${esc(r.fromName)}</div>
+              <div style="font-size:10px;color:var(--text-secondary);margin-top:3px">"${esc(r.msg)}"</div>
+            </div>
+            <div class="edit-btn-row">
+              <button class="btn btn-green btn-sm" onclick="doApproveEdit('${s.id}',${ri})">GRANT</button>
+              <button class="btn btn-pink btn-sm" onclick="doDenyEdit('${s.id}',${ri})">DENY</button>
+            </div>
+          </div>`).join('')}` : ``}
+      </div>`;
     }
+ 
 
-    // ── NEW SNIPPET ───────────────────────────────────────────────────────────
     function renderNew() {
+      const selTopicSubs = S.nf.topic ? getSubtopicsForTopic(S.nf.topic) : [];
       return `
-    <div class="panel">
-      <div class="panel-title">ADD NEW SNIPPET</div>
-      ${renderAlert()}
-      <div class="grid-2">
-        <div class="field"><label>// Project Name</label>
-          <input type="text" placeholder="e.g. Auth Module" value="${esc(S.nf.name)}"
-            oninput="S.nf.name=this.value" /></div>
-        <div class="field"><label>// Description</label>
-          <input type="text" placeholder="brief description..." value="${esc(S.nf.desc)}"
-            oninput="S.nf.desc=this.value" /></div>
-      </div>
-      <div class="grid-2">
-        <div class="field"><label>// Language</label>
-          <select oninput="S.nf.lang=this.value">
-            ${LANGUAGES.map(l => `<option value="${l}" ${S.nf.lang === l ? 'selected' : ''}>${l}</option>`).join('')}
-          </select></div>
-        <div class="field"><label>// Share Expiry (for receivers)</label>
-          <select oninput="S.nf.expiry=this.value">
-            ${EXPIRY_TYPES.map(e => `<option value="${e.value}" ${S.nf.expiry === e.value ? 'selected' : ''}>${e.label} — ${e.desc}</option>`).join('')}
-          </select></div>
-      </div>
-      <div class="field"><label>// Your Code</label>
-        <textarea style="min-height:280px;color:var(--text-primary);font-size:13px"
-          placeholder="// paste your code here..."
-          oninput="S.nf.code=this.value">${esc(S.nf.code)}</textarea></div>
-      ${S.nf.expiry === 'one-time' ? `<div class="alert alert-info">// Receivers can view once only. You always have full access.</div>` : ''}
-      ${S.nf.expiry === '25min' ? `<div class="alert" style="border-color:var(--neon-amber);color:var(--neon-amber);background:rgba(255,183,0,0.05)">// Share link expires for receivers after 25 min. Your access is permanent.</div>` : ''}
-      <button class="btn btn-cyan btn-full" style="margin-top:8px" onclick="doCreateSnippet()">SAVE TO VAULT</button>
-    </div>`;
+      <div class="panel">
+        <div class="panel-title">ADD NEW SNIPPET</div>
+        ${renderAlert()}
+        <div class="grid-2">
+          <div class="field"><label>// Project Name</label>
+            <input type="text" placeholder="e.g. Array Sort" value="${esc(S.nf.name)}"
+              oninput="S.nf.name=this.value" /></div>
+          <div class="field"><label>// Description</label>
+            <input type="text" placeholder="brief description..." value="${esc(S.nf.desc)}"
+              oninput="S.nf.desc=this.value" /></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>// Language</label>
+            <select oninput="S.nf.lang=this.value">
+              ${LANGUAGES.map(l=>`<option value="${l}" ${S.nf.lang===l?'selected':''}>${l}</option>`).join('')}
+            </select></div>
+          <div class="field"><label>// Share Expiry</label>
+            <select oninput="S.nf.expiry=this.value">
+              ${EXPIRY_TYPES.map(e=>`<option value="${e.value}" ${S.nf.expiry===e.value?'selected':''}>${e.label} — ${e.desc}</option>`).join('')}
+            </select></div>
+        </div>
+ 
+        <!-- Topic / Subtopic row -->
+        <div style="background:rgba(0,245,255,0.03);border:1px solid rgba(0,245,255,0.12);padding:14px 16px;margin-bottom:16px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--neon-cyan);letter-spacing:2px;margin-bottom:12px">📁 TOPIC CLASSIFICATION</div>
+          <div class="grid-2">
+            <div class="field" style="margin-bottom:0"><label>// Topic</label>
+              <select oninput="S.nf.topic=this.value;S.nf.subtopic='';render()">
+                <option value="">-- Select Topic --</option>
+                ${S.userTopics.map(t=>`<option value="${esc(t.name)}" ${S.nf.topic===t.name?'selected':''}>${esc(t.name)}</option>`).join('')}
+              </select></div>
+            <div class="field" style="margin-bottom:0"><label>// Subtopic</label>
+              <select oninput="S.nf.subtopic=this.value" ${!S.nf.topic?'disabled':''}>
+                <option value="">-- Select Subtopic --</option>
+                ${selTopicSubs.map(sub=>`<option value="${esc(sub)}" ${S.nf.subtopic===sub?'selected':''}>${esc(sub)}</option>`).join('')}
+              </select></div>
+          </div>
+          ${S.nf.topic && S.nf.subtopic ? `
+          <div style="margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">
+            ✓ Classified as: <span style="color:var(--neon-cyan)">${esc(S.nf.topic)} › ${esc(S.nf.subtopic)}</span>
+          </div>` : ''}
+        </div>
+ 
+        <div class="field"><label>// Your Code</label>
+          <textarea style="min-height:280px;color:var(--text-primary);font-size:13px"
+            placeholder="// paste your code here..."
+            oninput="S.nf.code=this.value">${esc(S.nf.code)}</textarea></div>
+        ${S.nf.expiry==='one-time'?`<div class="alert alert-info">// Receivers can view once only. You always have full access.</div>`:''}
+        ${S.nf.expiry==='25min'?`<div class="alert" style="border-color:var(--neon-amber);color:var(--neon-amber);background:rgba(255,183,0,0.05)">// Share link expires for receivers after 25 min. Your access is permanent.</div>`:''}
+        <button class="btn btn-cyan btn-full" style="margin-top:8px" onclick="doCreateSnippet()">SAVE TO VAULT</button>
+      </div>`;
     }
-
-    // ── USERS (admin) ─────────────────────────────────────────────────────────
+ 
+  
     function renderUsers() {
-      if (S.user.role !== 'admin') return `<div class="alert alert-error">// Admin access only</div>`;
+      if (S.user.role!=='admin') return `<div class="alert alert-error">// Admin access only</div>`;
       return `
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value">${DB.users.length}</div><div class="stat-label">Users</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--neon-purple)">${DB.snippets.length}</div><div class="stat-label">Snippets</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--neon-amber)">${DB.snippets.reduce((a, s) => a + s.accessed, 0)}</div><div class="stat-label">Total Views</div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title">USER REGISTRY</div>
-      <table class="data-table"><thead><tr>
-        <th>Status</th><th>Username</th><th>Role</th><th>Snippets</th><th>Joined</th>
-      </tr></thead><tbody>
-      ${DB.users.map(u => `<tr>
-        <td><span class="online-dot ${u.id === S.user.id ? 'dot-green' : 'dot-dim'}"></span>${u.id === S.user.id ? 'ONLINE' : 'OFFLINE'}</td>
-        <td style="color:var(--text-primary)">${esc(u.username)}</td>
-        <td><span class="badge ${u.role === 'admin' ? 'badge-onetime' : 'badge-lang'}">${u.role.toUpperCase()}</span></td>
-        <td>${DB.snippets.filter(s => s.ownerId === u.id).length}</td>
-        <td>${ago(u.created)}</td>
-      </tr>`).join('')}
-      </tbody></table>
-    </div>`;
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value">${DB.users.length}</div><div class="stat-label">Users</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--neon-purple)">${DB.snippets.length}</div><div class="stat-label">Snippets</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--neon-amber)">${DB.snippets.reduce((a,s)=>a+s.accessed,0)}</div><div class="stat-label">Total Views</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--neon-pink)">—</div><div class="stat-label">Reports</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">USER REGISTRY</div>
+        <table class="data-table"><thead><tr>
+          <th>Status</th><th>Username</th><th>Role</th><th>Snippets</th><th>Topics</th><th>Joined</th>
+        </tr></thead><tbody>
+        ${DB.users.map(u=>`<tr>
+          <td><span class="online-dot ${u.id===S.user.id?'dot-green':'dot-dim'}"></span>${u.id===S.user.id?'ONLINE':'OFFLINE'}</td>
+          <td style="color:var(--text-primary)">${esc(u.username)}</td>
+          <td><span class="badge ${u.role==='admin'?'badge-onetime':'badge-lang'}">${u.role.toUpperCase()}</span></td>
+          <td>${DB.snippets.filter(s=>s.ownerId===u.id).length}</td>
+          <td style="color:var(--text-dim)">—</td>
+          <td>${ago(u.created)}</td>
+        </tr>`).join('')}
+        </tbody></table>
+      </div>`;
     }
-
-    // ── APP SHELL ─────────────────────────────────────────────────────────────
+ 
+    
     function renderApp() {
       const tabs = [
-        { id: 'vault', label: 'MY VAULT' },
-        { id: 'new', label: '+ NEW SNIPPET' },
-        ...(S.user.role === 'admin' ? [{ id: 'users', label: 'USERS' }] : [])
+        { id:'vault', label:'MY VAULT' },
+        { id:'new', label:'+ NEW SNIPPET' },
+        ...(S.user.role==='admin'?[{id:'users',label:'USERS'}]:[])
       ];
       let content = '';
-      if (S.tab === 'vault') content = renderVault();
-      else if (S.tab === 'new') content = renderNew();
-      else if (S.tab === 'users') content = renderUsers();
-
+      if (S.tab==='vault') content = renderVault();
+      else if (S.tab==='new') content = renderNew();
+      else if (S.tab==='users') content = renderUsers();
+ 
       return `
-    <div class="header">
-      <div class="logo">CODE<span>789</span></div>
-      <div class="header-right">
-        <div class="user-badge">// ${esc(S.user.username)} · ${S.user.role.toUpperCase()}</div>
-        <button class="btn btn-pink btn-sm"
-          onclick="set({view:'auth',user:null,selId:null,editId:null,ef:null,alert:null,lf:{username:'',password:''},rf:{username:'',password:'',confirm:''}})">
-          LOGOUT</button>
+      <div class="header">
+        <div class="logo">CODE<span>789</span></div>
+        <div class="header-right">
+          <div class="user-badge">// ${esc(S.user.username)} · ${S.user.role.toUpperCase()}</div>
+          <button class="btn btn-pink btn-sm"
+            onclick="set({view:'auth',user:null,selId:null,editId:null,ef:null,alert:null,userTopics:[],filterTopic:null,filterSubtopic:null,lf:{username:'',password:''},rf:{username:'',password:'',confirm:''}})">
+            LOGOUT</button>
+        </div>
       </div>
-    </div>
-    ${renderAlert()}
-    <div class="nav-tabs">
-      ${tabs.map(t => `<button class="nav-tab ${S.tab === t.id ? 'active' : ''}"
-        onclick="set({tab:'${t.id}',selId:S.selId,alert:null})">${t.label}</button>`).join('')}
-    </div>
-    ${content}`;
+      ${renderAlert()}
+      <div class="nav-tabs">
+        ${tabs.map(t=>`<button class="nav-tab ${S.tab===t.id?'active':''}"
+          onclick="set({tab:'${t.id}',selId:S.selId,alert:null})">${t.label}</button>`).join('')}
+      </div>
+      ${content}`;
     }
-
-    // ── SHARE PAGE (public, no login) ─────────────────────────────────────────
+ 
+    
     async function renderSharePage(snippetId) {
       document.getElementById('root').innerHTML = `
       <div style="min-height:100vh;display:flex;align-items:center;justify-content:center">
@@ -1240,15 +858,14 @@
           [LOADING] Fetching snippet...
         </div>
       </div>`;
-
+ 
       await fbLoad();
-      const s = DB.snippets.find(x => x.id === snippetId.toUpperCase());
-
+      const s = DB.snippets.find(x => x.id===snippetId.toUpperCase());
       const home = `<button onclick="window.location.href=window.location.href.split('?')[0]"
-      style="font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;
-      padding:8px 16px;border:1px solid rgba(0,245,255,0.4);color:rgba(0,245,255,0.7);
-      background:transparent;cursor:pointer;margin-top:20px;display:block">↩ LOGIN / HOME</button>`;
-
+        style="font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;
+        padding:8px 16px;border:1px solid rgba(0,245,255,0.4);color:rgba(0,245,255,0.7);
+        background:transparent;cursor:pointer;margin-top:20px;display:block">↩ LOGIN / HOME</button>`;
+ 
       if (!s) {
         document.getElementById('root').innerHTML = `
         <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
@@ -1260,32 +877,27 @@
         </div>`;
         return;
       }
-
-      const expired = s.expiryType === '25min' && s.expiresAt && now() > s.expiresAt;
-      const destroyed = s.expiryType === 'one-time' && s.accessed > 0;
-      const owner = DB.users.find(u => u.id === s.ownerId);
-
-      if (!expired && !destroyed) {
-        s.accessed++;
-        await fbSaveSnippet(s);
-      }
-
-      const codeBlock = (expired || destroyed)
-        ? `<div style="padding:20px;border:1px solid ${expired ? 'rgba(255,183,0,0.3)' : 'rgba(255,7,58,0.3)'};
-            color:${expired ? 'var(--neon-amber)' : 'var(--neon-pink)'};
-            background:${expired ? 'rgba(255,183,0,0.05)' : 'rgba(255,7,58,0.05)'};
-            font-family:'Share Tech Mono',monospace;font-size:12px">
-           ${expired ? '⚡ This share link has expired (25min window closed).' : '🔥 One-time snippet already viewed. Code is gone.'}
-         </div>`
+ 
+      const expired = s.expiryType==='25min' && s.expiresAt && now()>s.expiresAt;
+      const destroyed = s.expiryType==='one-time' && s.accessed>0;
+      const owner = DB.users.find(u=>u.id===s.ownerId);
+ 
+      if (!expired && !destroyed) { s.accessed++; await fbSaveSnippet(s); }
+ 
+      const codeBlock = (expired||destroyed)
+        ? `<div style="padding:20px;border:1px solid ${expired?'rgba(255,183,0,0.3)':'rgba(255,7,58,0.3)'};
+              color:${expired?'var(--neon-amber)':'var(--neon-pink)'};
+              background:${expired?'rgba(255,183,0,0.05)':'rgba(255,7,58,0.05)'};
+              font-family:'Share Tech Mono',monospace;font-size:12px">
+             ${expired?'⚡ This share link has expired (25min window closed).':'🔥 One-time snippet already viewed. Code is gone.'}
+           </div>`
         : `<div style="position:relative;background:#020408;border:1px solid rgba(0,245,255,0.15);
-              padding:20px;font-family:'Share Tech Mono',monospace;font-size:13px;
-              line-height:1.7;color:#e8f4f8;overflow-x:auto;white-space:pre-wrap;
-              user-select:none;-webkit-user-select:none">
-           <div style="position:absolute;inset:0;pointer-events:none;
-             background:repeating-linear-gradient(-45deg,rgba(0,245,255,0.012) 0px,rgba(0,245,255,0.012) 1px,transparent 1px,transparent 8px);z-index:2"></div>
-           ${esc(s.code)}
-         </div>`;
-
+                padding:20px;font-family:'Share Tech Mono',monospace;font-size:13px;
+                line-height:1.7;color:#e8f4f8;overflow-x:auto;white-space:pre-wrap;
+                user-select:none;-webkit-user-select:none">
+             ${esc(s.code)}
+           </div>`;
+ 
       document.getElementById('root').innerHTML = `
       <div style="min-height:100vh;padding:32px 16px;max-width:780px;margin:0 auto">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
@@ -1298,27 +910,28 @@
         <div class="panel">
           <div style="margin-bottom:14px">
             <div class="snippet-project" style="font-size:16px;margin-bottom:6px">${esc(s.projectName)}</div>
-            ${s.description ? `<div class="snippet-desc">${esc(s.description)}</div>` : ''}
+            ${s.description?`<div class="snippet-desc">${esc(s.description)}</div>`:''}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
             <span class="badge badge-lang">${s.language}</span>
             ${expiryBadge(s.expiryType)}
-            <span class="badge-id" style="align-self:center">shared by ${esc(owner ? owner.username : 'unknown')} · ${s.accessed} views</span>
+            ${s.topic?`<span class="badge badge-topic">${esc(s.topic)}${s.subtopic?' › '+esc(s.subtopic):''}</span>`:''}
+            <span class="badge-id" style="align-self:center">shared by ${esc(owner?owner.username:'unknown')} · ${s.accessed} views</span>
           </div>
           ${codeBlock}
-          ${!expired && !destroyed ? `
+          ${!expired&&!destroyed?`
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-amber btn-sm"
               onclick="S.erSnippetId='${s.id}';renderEditRequestForm()">REQUEST EDIT ACCESS</button>
           </div>
-          <div id="er-form"></div>`: ``}
+          <div id="er-form"></div>`:''}
         </div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);text-align:center;margin-top:12px;letter-spacing:1px">
-          SHARE LINK IS PERMANENT · CODE EXPIRY FOR VIEWERS: ${s.expiryType === 'one-time' ? '🔥 ONE-TIME' : s.expiryType === '25min' ? '⚡ 25MIN' : '∞ NONE'}
+          CODE EXPIRY FOR VIEWERS: ${s.expiryType==='one-time'?'🔥 ONE-TIME':s.expiryType==='25min'?'⚡ 25MIN':'∞ NONE'}
         </div>
       </div>`;
     }
-
+ 
     function renderEditRequestForm() {
       const el = document.getElementById('er-form');
       if (!el) return;
@@ -1332,42 +945,34 @@
         <button class="btn btn-pink" onclick="document.getElementById('er-form').innerHTML=''">CANCEL</button>
       </div>`;
     }
-
-    // ── MAIN RENDER ───────────────────────────────────────────────────────────
+ 
+    
     function render() {
       const root = document.getElementById('root');
-      root.innerHTML = S.view === 'auth' ? renderAuth() : renderApp();
+      root.innerHTML = S.view==='auth' ? renderAuth() : renderApp();
     }
-
-    // ── Anti-screenshot ───────────────────────────────────────────────────────
-    document.addEventListener('visibilitychange', () => {
-      document.body.classList.toggle('unfocused', document.hidden);
-    });
+ 
+    // Anti-screenshot
+    document.addEventListener('visibilitychange', () => { document.body.classList.toggle('unfocused', document.hidden); });
     window.addEventListener('blur', () => document.body.classList.add('unfocused'));
     window.addEventListener('focus', () => document.body.classList.remove('unfocused'));
     document.addEventListener('keydown', e => {
-      const ss = e.key === 'PrintScreen' ||
-        (e.metaKey && e.shiftKey && ['3', '4', '5'].includes(e.key));
-      if (ss) {
+      if (e.key==='PrintScreen' || (e.metaKey&&e.shiftKey&&['3','4','5'].includes(e.key))) {
         e.preventDefault();
         document.querySelectorAll('.code-display').forEach(el => {
-          el.style.filter = 'blur(12px)';
-          setTimeout(() => el.style.filter = '', 900);
+          el.style.filter='blur(12px)';
+          setTimeout(()=>el.style.filter='', 900);
         });
       }
     });
-
-    // ── BOOT ──────────────────────────────────────────────────────────────────
+ 
+    
     (async () => {
       const params = new URLSearchParams(window.location.search);
       const sid = params.get('snippet');
-      if (sid) {
-        await renderSharePage(sid);
-      } else {
-        render();
-      }
+      if (sid) { await renderSharePage(sid); }
+      else { render(); }
     })();
   </script>
 </body>
-
 </html>
